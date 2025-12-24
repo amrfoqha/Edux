@@ -4,10 +4,12 @@ const Footer = () => {
             <div className="container mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div className="space-y-2">
                     <img
+
                         src="/images/edx.webp"
                         alt="EduX Logo"
                         className="h-10 w-10"
                     />
+
                     <p>Empowering students through collaborative learning and resource sharing</p>
                 </div>
 
@@ -39,6 +41,7 @@ const Footer = () => {
                         <a href="#" className="hover:text-purple-600">Instagram</a>
                         <a href="#" className="hover:text-purple-600">LinkedIn</a>
                     </div>
+
                     <p className="text-sm">support@edux.edu</p>
                 </div>
             </div>
