@@ -8,7 +8,7 @@ const Footer = () => {
                         alt="EduX Logo"
                         className="h-10 w-10"
                     />
-                    <p>Empowering students through collaborative learning and resource sharing.</p>
+                    <p>Empowering students through collaborative learning and resource sharing</p>
                 </div>
 
                 <div>
