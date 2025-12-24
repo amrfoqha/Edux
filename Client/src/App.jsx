@@ -5,12 +5,14 @@ import LoginRegPage from "./Pages/LoginRegPage";
 import LoginFormComponent from "./Components/LoginFormComponent";
 import RegistarionComponent from "./Components/RegistarionComponent";
 import Header from "./Components/Header";
+import Footer from "./Components/Footer";
 
 
 function App() {
   return (
     <BrowserRouter>
       <Header />
+      <Footer />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={<LoginRegPage />}>
