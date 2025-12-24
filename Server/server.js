@@ -21,5 +21,7 @@ require("./routes/favorite.routes")(app);
 require("./routes/notification.routes")(app);
 require("./routes/review.routes")(app);
 require("./routes/resource_request.routes")(app);
+require("./routes/auth.routes")(app);
+
 
 app.listen(port, () => console.log(`Listening on port: ${port}`));
