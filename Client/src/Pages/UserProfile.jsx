@@ -1,40 +1,75 @@
-import Header from "../Components/Header";
-import Footer from "../Components/Footer";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { UploadForm } from "../Components/UploadForm";
+import FavoriteForm from "../Components/FavoriteForm";
+import ChatForm from "../Components/ChatForm";
+import AiPicksForm from "../Components/AiPicksForm";
 
 const UserProfile = () => {
+  const [activeTab, setActiveTab] = useState("uploads");
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
-
-      <main className="flex-grow">
+      <main className="grow">
         {/* Top Profile Section */}
-        <section className="container mx-auto px-6 mt-8">
-          <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 rounded-3xl p-8 shadow-xl text-white">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              
+        <section className="container mx-auto px-6 mt-8 flex flex-col">
+          <div className="bg-linear-to-r from-purple-500 via-pink-500 to-orange-400 relative rounded-t-3xl w-full h-[150px]">
+            <motion.div
+              className="absolute inset-0 opacity-20"
+              animate={{
+                backgroundPosition: ["0% 0%", "100% 100%"],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                repeatType: "reverse",
+              }}
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, white 2px, transparent 2px)",
+                backgroundSize: "40px 40px",
+              }}
+            />
+          </div>
+          <div className="rounded-3xl p-6 pl-8 shadow-xl text-white">
+            <div className="flex flex-col md:flex-row items-center gap-8 relative">
               {/* Avatar */}
-              <div className="relative">
-                <div className="w-28 h-28 rounded-full bg-white/20 flex items-center justify-center text-4xl font-bold">
+              <div className="absolute bottom-6 left-0 hover:scale-105 transition">
+                <div
+                  className="w-36 h-36 rounded-full bg-white/20 flex items-center justify-center 
+                text-5xl font-semibold bg-linear-to-r from-purple-500 via-pink-500 to-orange-400  border-4 border-white shadow-[.5px_.5px_20px_0_gray] "
+                >
                   U
                 </div>
-                <span className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white"></span>
+                <span className="absolute bottom-1 right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white">
+                  {/* for Active Status  */}
+                </span>
               </div>
 
               {/* User Info */}
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold">Student Name</h1>
-                <p className="opacity-90 text-sm">user@email.com</p>
+              <div className="flex-1 ml-42">
+                <h1 className="text-5xl font-semibold bg-linear-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-transparent">
+                  Student Name
+                </h1>
 
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <Badge text="University Name" />
+                <div className="flex flex-wrap gap-2 mt-3  ">
+                  <Badge
+                    text="University"
+                    BackColor="bg-secondary"
+                    color="text-white"
+                  />
                   <Badge text="Faculty" />
                   <Badge text="Department" />
                 </div>
+                <p className="opacity-90 text-xl text-secondary mt-2">
+                  user@email.com
+                </p>
               </div>
 
               {/* Stats */}
-              <div className="flex gap-4">
-                <StatCard label="Uploads" value="0" />
-                <StatCard label="Favorites" value="0" />
+              <div className="flex gap-4   ">
+                <StatCard label="Uploads" value="0" highlight />
+                <StatCard label="Favorites" value="0" highlight />
                 <StatCard label="Downloads" value="128" highlight />
               </div>
             </div>
@@ -42,81 +77,73 @@ const UserProfile = () => {
         </section>
 
         {/* Tabs */}
-        <section className="container mx-auto px-6 mt-6">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-3 flex gap-3">
-            <Tab active text="My Uploads" icon="⬆️" />
-            <Tab text="Favorites" icon="❤️" />
-            <Tab text="Chat" icon="💬" />
-            <Tab text="AI Picks" icon="✨" />
+        <section className="container mx-auto px-6 mt-6 ">
+          <div className=" bg-white rounded-2xl shadow-sm border border-gray-100 py-2 px-1  flex justify-evenly w-130 ">
+            <Tab
+              active={activeTab === "uploads"}
+              text="My Uploads"
+              icon="⬆️"
+              onClick={() => setActiveTab("uploads")}
+            />
+            <Tab
+              active={activeTab === "favorites"}
+              text="Favorites"
+              icon="❤️"
+              onClick={() => setActiveTab("favorites")}
+            />
+            <Tab
+              active={activeTab === "chat"}
+              text="Chat"
+              icon="💬"
+              onClick={() => setActiveTab("chat")}
+            />
+            <Tab
+              active={activeTab === "ai-picks"}
+              text="AI Picks"
+              icon="✨"
+              onClick={() => setActiveTab("ai-picks")}
+            />
           </div>
         </section>
 
         {/* ===== Content ===== */}
-        <section className="container mx-auto px-6 mt-10 mb-20">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">My Uploads</h2>
-              <p className="text-gray-500 text-sm">
-                Manage your shared resources
-              </p>
-            </div>
-
-            <button className="bg-purple-600 text-white px-5 py-2 rounded-xl shadow hover:bg-purple-700 transition">
-              Upload New
-            </button>
-          </div>
-
-          {/* Empty State */}
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-16 text-center">
-            <div className="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl mb-6">
-              ⬆️
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              No uploads yet
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Share your first resource with the community
-            </p>
-            <button className="bg-purple-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-purple-700 transition">
-              Upload Resource
-            </button>
-          </div>
+        <section className="animate-in fade-in zoom-in duration-900 ">
+          {activeTab === "uploads" && <UploadForm />}
+          {activeTab === "favorites" && <FavoriteForm />}
+          {activeTab === "chat" && <ChatForm />}
+          {activeTab === "ai-picks" && <AiPicksForm />}
         </section>
       </main>
-
     </div>
   );
 };
 
-
-/* Reusable Components  */
-
-const Badge = ({ text }) => (
-  <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold">
+const Badge = ({ text, BackColor = "bg-white/20", color = "text-black" }) => (
+  <span
+    className={`px-3 py-1 ${BackColor} rounded-full text-md font-semibold border border-gray-200 ${color}`}
+  >
     {text}
   </span>
 );
 
-const StatCard = ({ label, value, highlight }) => (
+const StatCard = ({ label, value }) => (
   <div
-    className={`w-24 h-20 rounded-2xl flex flex-col items-center justify-center text-center ${
-      highlight
-        ? "bg-white text-orange-500"
-        : "bg-white/20 text-white"
-    }`}
+    className={`flex flex-col w-26 items-center justify-center text-center bg-gradient-to-br from-accent/25 to-accent/10 p-4 rounded-2xl 
+      hover:bg-accent/10 transition hover:scale-105`}
   >
-    <span className="text-2xl font-bold">{value}</span>
-    <span className="text-xs">{label}</span>
+    <span className="text-4xl font-semibold text-accent mb-1">{value}</span>
+    <span className="text-sm text-muted-foreground font-medium">{label}</span>
   </div>
 );
 
-const Tab = ({ text, icon, active }) => (
+const Tab = ({ text, icon, active, onClick }) => (
   <button
-    className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold transition ${
+    className={`flex items-center gap-2 px-3 py-2 rounded-md  text-lg font-semibold transition-all duration-300 ease-in-out ${
       active
         ? "bg-purple-600 text-white shadow"
-        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+        : "bg-white text-gray-600 hover:bg-gray-50"
     }`}
+    onClick={onClick}
   >
     <span>{icon}</span>
     {text}

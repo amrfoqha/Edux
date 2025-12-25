@@ -1,18 +1,19 @@
 const User = require("../models/User.model");
+
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
 module.exports = (app) => {
-
   app.post("/api/auth/register", async (req, res) => {
     try {
       const {
-        username,
+        name,
         email,
         password,
         university,
         faculty,
-        department
+        department,
+        confirmPassword,
       } = req.body;
 
       const existingUser = await User.findOne({ email });
@@ -20,33 +21,30 @@ module.exports = (app) => {
         return res.status(400).json({ message: "User already exists" });
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-
       const user = await User.create({
-        username,
+        name,
         email,
-        password: hashedPassword,
+        password,
         university,
         faculty,
-        department
+        department,
+        confirmPassword,
       });
 
-      const token = jwt.sign(
-        { id: user._id },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
 
       res.status(201).json({
         token,
         user: {
           id: user._id,
-          username: user.username,
-          email: user.email
-        }
+          name,
+          email,
+        },
       });
-
     } catch (err) {
+      console.log(err);
       res.status(500).json({ message: "Server error", error: err });
     }
   });
@@ -65,24 +63,19 @@ module.exports = (app) => {
         return res.status(400).json({ message: "Invalid email or password" });
       }
 
-      const token = jwt.sign(
-        { id: user._id },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
-
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
       res.json({
         token,
         user: {
           id: user._id,
-          username: user.username,
-          email: user.email
-        }
+          name: user.name,
+          email,
+        },
       });
-
     } catch (err) {
       res.status(500).json({ message: "Server error", error: err });
     }
   });
-
 };
