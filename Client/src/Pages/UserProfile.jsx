@@ -4,7 +4,6 @@ import Footer from "../Components/Footer";
 const UserProfile = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
-      <Header />
 
       <main className="flex-grow">
         {/* Top Profile Section */}
@@ -85,7 +84,6 @@ const UserProfile = () => {
         </section>
       </main>
 
-      <Footer />
     </div>
   );
 };

@@ -1,19 +1,20 @@
-import HomePage from "./Pages/HomePage";
-import LoginRegPage from "./Pages/LoginRegPage";
-import {Navigate, Route, Routes} from "react-router-dom";
-import Header from "./Components/Header.jsx";
-import ChatPage from "./Pages/ChatPage.jsx";
+import {Navbar} from "./Layouts/Navbar.jsx";
+import {useAuth} from "./Hooks/useAuth.jsx";
+import AuthRoutes from "./Routes/AuthRoutes.jsx";
+import UnAuthRoutes from "./Routes/UnAuthRoutes.jsx";
+
 function App() {
+    const {isAuthenticated, loading} = useAuth();
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <>
-            <Header/>
-            <Routes>
-                <Route path="/" element={<HomePage/>}/>
-
-                <Route path="/auth" element={<LoginRegPage/>}/>
-                <Route path="/chat" element={<ChatPage/>}/>
-                <Route path="*" element={<Navigate to="/" replace/>}/>
-            </Routes>
+            <Navbar isLoggedIn={isAuthenticated}/>
+            {isAuthenticated ? <AuthRoutes/> : <UnAuthRoutes/>
+            }
         </>
     );
 }
