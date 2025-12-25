@@ -1,79 +1,103 @@
 import { useState } from "react";
 import axios from "axios";
 
-const LoginFormComponent = ({ switchToRegister }) => {
-  const [emailInput, setEmailInput] = useState("");
-  const [passwordInput, setPasswordInput] = useState("");
+const LoginFormComponent = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const { data } = await axios.post(
         "http://localhost:8000/api/auth/login",
-        {
-          email: emailInput,
-          password: passwordInput,
-        }
+        { email, password }
       );
-      
+
       localStorage.setItem("token", data.token);
-      alert("Login successful!");
+      alert("Login successful");
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold text-center text-purple-600 mb-2">
-        Welcome Back
-      </h2>
-      <p className="text-center text-gray-500 mb-6">
-        Sign in to access your resources
-      </p>
+    <div className="grid md:grid-cols-2 gap-12 items-center">
+      {/* Left Side */}
+      <div>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          Welcome back.
+          <br />
+          Continue learning.
+        </h1>
+        <p className="text-gray-500 mb-8">
+          Join thousands of students from over <b>200+ universities</b>
+        </p>
 
-      <form className="space-y-4" onSubmit={handleLogin}>
-        <div>
-          <label className="block text-gray-700">Email</label>
-          <input
-            type="email"
-            placeholder="you@university.edu"
-            value={emailInput}
-            onChange={(e) => setEmailInput(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
-        </div>
+        <Feature text="10,000+ resources" icon="📘" />
+        <Feature text="Thriving student community" icon="👥" />
+        <Feature text="Smart AI recommendations" icon="✨" />
+      </div>
 
-        <div>
-          <label className="block text-gray-700">Password</label>
-          <input
-            type="password"
-            placeholder="••••••••"
-            value={passwordInput}
-            onChange={(e) => setPasswordInput(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
-        </div>
+      {/* Right Side */}
+      <form
+        onSubmit={handleLogin}
+        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md mx-auto"
+      >
+        <h2 className="text-2xl font-bold text-center mb-2">Welcome Back!</h2>
+        <p className="text-center text-gray-500 mb-6">
+          Sign in to access your resources
+        </p>
 
-        <button
-          type="submit"
-          className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700"
-        >
+        <Input
+          label="Email Address"
+          type="email"
+          value={email}
+          onChange={setEmail}
+          placeholder="you@university.edu"
+        />
+
+        <Input
+          label="Password"
+          type="password"
+          value={password}
+          onChange={setPassword}
+          placeholder="••••••••"
+        />
+
+        <button className="w-full mt-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold">
           Sign In
         </button>
-      </form>
 
-      <p className="text-center text-gray-500 mt-4">
-        Don't have an account?{" "}
-        <button
-          onClick={switchToRegister}
-          className="text-purple-600 font-semibold hover:underline"
-        >
-          Sign up
-        </button>
-      </p>
+        <p className="text-xs text-center text-gray-400 mt-3">
+          Takes less than 10 seconds. Secure login.
+        </p>
+      </form>
     </div>
   );
 };
 
 export default LoginFormComponent;
+
+/*  Small Components */
+
+const Feature = ({ icon, text }) => (
+  <div className="flex items-center gap-4 bg-white rounded-xl p-4 mb-4 shadow-sm">
+    <span className="text-2xl">{icon}</span>
+    <p className="font-medium text-gray-700">{text}</p>
+  </div>
+);
+
+const Input = ({ label, type, value, onChange, placeholder }) => (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-600 mb-1">
+      {label}
+    </label>
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+    />
+  </div>
+);
