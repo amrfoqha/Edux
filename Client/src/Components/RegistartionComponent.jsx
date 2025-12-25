@@ -8,6 +8,7 @@ const RegistrationComponent = ({ switchToLogin }) => {
   const [universityInput, setUniversityInput] = useState("");
   const [facultyInput, setFacultyInput] = useState("");
   const [departmentInput, setDepartmentInput] = useState("");
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -15,9 +16,10 @@ const RegistrationComponent = ({ switchToLogin }) => {
       const { data } = await axios.post(
         "http://localhost:8000/api/auth/register",
         {
-          username: usernameInput,
+          name: usernameInput,
           email: emailInput,
           password: passwordInput,
+          confirmPassword: confirmPasswordInput,
           university: universityInput,
           faculty: facultyInput,
           department: departmentInput,
@@ -28,7 +30,7 @@ const RegistrationComponent = ({ switchToLogin }) => {
       alert("Registration successful!");
       switchToLogin();
     } catch (err) {
-      alert(err.response?.data?.message || "Registration failed");
+      console.log(err.response || "Registration failed");
     }
   };
 
@@ -37,9 +39,7 @@ const RegistrationComponent = ({ switchToLogin }) => {
       <h2 className="text-3xl font-bold text-center text-purple-600 mb-2">
         Create Account
       </h2>
-      <p className="text-center text-gray-500 mb-6">
-        Join the EduX community
-      </p>
+      <p className="text-center text-gray-500 mb-6">Join the EduX community</p>
 
       <form className="space-y-4" onSubmit={handleRegister}>
         <div>
@@ -71,6 +71,16 @@ const RegistrationComponent = ({ switchToLogin }) => {
             placeholder="••••••••"
             value={passwordInput}
             onChange={(e) => setPasswordInput(e.target.value)}
+            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+          />
+        </div>
+        <div>
+          <label className="block text-gray-700">Confirm Password</label>
+          <input
+            type="password"
+            placeholder="••••••••"
+            value={confirmPasswordInput}
+            onChange={(e) => setConfirmPasswordInput(e.target.value)}
             className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
           />
         </div>

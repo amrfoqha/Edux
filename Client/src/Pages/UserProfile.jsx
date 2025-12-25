@@ -11,7 +11,6 @@ const UserProfile = () => {
         <section className="container mx-auto px-6 mt-8">
           <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 rounded-3xl p-8 shadow-xl text-white">
             <div className="flex flex-col md:flex-row items-center gap-8">
-              
               {/* Avatar */}
               <div className="relative">
                 <div className="w-28 h-28 rounded-full bg-white/20 flex items-center justify-center text-4xl font-bold">
@@ -90,9 +89,6 @@ const UserProfile = () => {
   );
 };
 
-
-/* Reusable Components  */
-
 const Badge = ({ text }) => (
   <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold">
     {text}
@@ -102,9 +98,7 @@ const Badge = ({ text }) => (
 const StatCard = ({ label, value, highlight }) => (
   <div
     className={`w-24 h-20 rounded-2xl flex flex-col items-center justify-center text-center ${
-      highlight
-        ? "bg-white text-orange-500"
-        : "bg-white/20 text-white"
+      highlight ? "bg-white text-orange-500" : "bg-white/20 text-white"
     }`}
   >
     <span className="text-2xl font-bold">{value}</span>

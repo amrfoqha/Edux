@@ -15,7 +15,7 @@ const LoginFormComponent = ({ switchToRegister }) => {
           password: passwordInput,
         }
       );
-
+      
       localStorage.setItem("token", data.token);
       alert("Login successful!");
     } catch (err) {

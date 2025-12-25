@@ -2,7 +2,8 @@ import { useState } from "react";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import LoginFormComponent from "../Components/LoginFormComponent";
-import RegistrationComponent from "../Components/RegistrationComponent";
+import RegistartionComponent from "../Components/RegistartionComponent";
+import RegistrationComponent from "../Components/RegistartionComponent";
 
 const LoginRegPage = () => {
   const [isLogin, setIsLogin] = useState(true);
