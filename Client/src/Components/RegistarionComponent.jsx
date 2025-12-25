@@ -1,130 +1,97 @@
 import { useState } from "react";
 import axios from "axios";
 
-const RegistrationComponent = ({ switchToLogin }) => {
-  const [usernameInput, setUsernameInput] = useState("");
-  const [emailInput, setEmailInput] = useState("");
-  const [passwordInput, setPasswordInput] = useState("");
-  const [universityInput, setUniversityInput] = useState("");
-  const [facultyInput, setFacultyInput] = useState("");
-  const [departmentInput, setDepartmentInput] = useState("");
+const RegistarionComponent = () => {
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    university: "",
+    faculty: "",
+    department: "",
+  });
+
+  const handleChange = (key, value) =>
+    setForm({ ...form, [key]: value });
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
       const { data } = await axios.post(
         "http://localhost:8000/api/auth/register",
-        {
-          username: usernameInput,
-          email: emailInput,
-          password: passwordInput,
-          university: universityInput,
-          faculty: facultyInput,
-          department: departmentInput,
-        }
+        form
       );
-
       localStorage.setItem("token", data.token);
-      alert("Registration successful!");
-      switchToLogin();
+      alert("Account created successfully");
     } catch (err) {
       alert(err.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div>
-      <h2 className="text-3xl font-bold text-center text-purple-600 mb-2">
-        Create Account
-      </h2>
-      <p className="text-center text-gray-500 mb-6">
-        Join the EduX community
-      </p>
+    <div className="grid md:grid-cols-2 gap-12 items-center">
+      {/* Left */}
+      <div>
+        <h1 className="text-4xl font-bold text-gray-900 mb-6">
+          Join thousands.<br />Start sharing.
+        </h1>
 
-      <form className="space-y-4" onSubmit={handleRegister}>
-        <div>
-          <label className="block text-gray-700">Username</label>
-          <input
-            type="text"
-            placeholder="johndoe"
-            value={usernameInput}
-            onChange={(e) => setUsernameInput(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
-        </div>
+        <Feature icon="📘" text="10,000+ resources" />
+        <Feature icon="👥" text="Thriving student community" />
+        <Feature icon="✨" text="Smart AI recommendations" />
+      </div>
 
-        <div>
-          <label className="block text-gray-700">Email</label>
-          <input
-            type="email"
-            placeholder="you@university.edu"
-            value={emailInput}
-            onChange={(e) => setEmailInput(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
-        </div>
+      {/* Right */}
+      <form
+        onSubmit={handleRegister}
+        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md mx-auto"
+      >
+        <h2 className="text-2xl font-bold text-center mb-2">
+          Create Account
+        </h2>
+        <p className="text-center text-gray-500 mb-6">
+          Join our community and start sharing knowledge
+        </p>
 
-        <div>
-          <label className="block text-gray-700">Password</label>
-          <input
-            type="password"
-            placeholder="••••••••"
-            value={passwordInput}
-            onChange={(e) => setPasswordInput(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
-        </div>
+        <Input label="Username" onChange={(v) => handleChange("username", v)} />
+        <Input label="Email Address" type="email" onChange={(v) => handleChange("email", v)} />
+        <Input label="Password" type="password" onChange={(v) => handleChange("password", v)} />
+        <Input label="University" onChange={(v) => handleChange("university", v)} />
+        <Input label="Faculty" onChange={(v) => handleChange("faculty", v)} />
+        <Input label="Department" onChange={(v) => handleChange("department", v)} />
 
-        <div>
-          <label className="block text-gray-700">University</label>
-          <input
-            type="text"
-            value={universityInput}
-            onChange={(e) => setUniversityInput(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700">Faculty</label>
-          <input
-            type="text"
-            value={facultyInput}
-            onChange={(e) => setFacultyInput(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700">Department</label>
-          <input
-            type="text"
-            placeholder="e.g. Computer Science"
-            value={departmentInput}
-            onChange={(e) => setDepartmentInput(e.target.value)}
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="w-full bg-purple-600 text-white py-2 rounded-md hover:bg-purple-700"
-        >
+        <button className="w-full mt-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold">
           Create Account
         </button>
-      </form>
 
-      <p className="text-center text-gray-500 mt-4">
-        Already have an account?{" "}
-        <button
-          onClick={switchToLogin}
-          className="text-purple-600 font-semibold hover:underline"
-        >
-          Sign in
-        </button>
-      </p>
+        <p className="text-xs text-center text-gray-400 mt-3">
+          Your information is safe and secure
+        </p>
+      </form>
     </div>
   );
 };
 
-export default RegistrationComponent;
+export default RegistarionComponent;
+
+/*  Helpers */
+
+const Feature = ({ icon, text }) => (
+  <div className="flex items-center gap-4 bg-white rounded-xl p-4 mb-4 shadow-sm">
+    <span className="text-2xl">{icon}</span>
+    <p className="font-medium text-gray-700">{text}</p>
+  </div>
+);
+
+const Input = ({ label, type = "text", onChange }) => (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-600 mb-1">
+      {label}
+    </label>
+    <input
+      type={type}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+    />
+  </div>
+);
