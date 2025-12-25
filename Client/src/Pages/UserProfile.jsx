@@ -10,10 +10,10 @@ const UserProfile = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
-      <main className="flex-grow">
+      <main className="grow">
         {/* Top Profile Section */}
         <section className="container mx-auto px-6 mt-8 flex flex-col">
-          <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 relative rounded-t-3xl w-full h-[150px]">
+          <div className="bg-linear-to-r from-purple-500 via-pink-500 to-orange-400 relative rounded-t-3xl w-full h-[150px]">
             <motion.div
               className="absolute inset-0 opacity-20"
               animate={{
@@ -37,7 +37,7 @@ const UserProfile = () => {
               <div className="absolute bottom-6 left-0 hover:scale-105 transition">
                 <div
                   className="w-36 h-36 rounded-full bg-white/20 flex items-center justify-center 
-                text-5xl font-semibold bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400  border-4 border-white shadow-[.5px_.5px_20px_0_gray] "
+                text-5xl font-semibold bg-linear-to-r from-purple-500 via-pink-500 to-orange-400  border-4 border-white shadow-[.5px_.5px_20px_0_gray] "
                 >
                   U
                 </div>
@@ -48,7 +48,7 @@ const UserProfile = () => {
 
               {/* User Info */}
               <div className="flex-1 ml-42">
-                <h1 className="text-5xl font-semibold bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-transparent">
+                <h1 className="text-5xl font-semibold bg-linear-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-transparent">
                   Student Name
                 </h1>
 

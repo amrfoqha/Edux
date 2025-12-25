@@ -5,7 +5,7 @@ const AiPicksForm = () => {
     <section className="container mx-auto px-6 mt-10 mb-20">
       <div className="flex-1 outline-none space-y-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="bg-gradient-to-br from-success to-info p-3 rounded-2xl">
+          <div className="bg-linear-to-br from-success to-info p-3 rounded-2xl">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -44,7 +44,7 @@ const AiPicksForm = () => {
                         shrink-0 [&amp;&gt;svg]:size-3 gap-1 [&amp;&gt;svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50
                         focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive
                         transition-[color,box-shadow] overflow-hidden border-transparent [a&amp;]:hover:bg-primary/90
-                        bg-gradient-to-r from-success to-info text-white shadow-xl px-3 py-1"
+                        bg-linear-to-r from-success to-info text-white shadow-xl px-3 py-1"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

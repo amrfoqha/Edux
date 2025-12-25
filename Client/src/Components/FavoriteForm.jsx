@@ -15,7 +15,7 @@ const FavoriteForm = () => {
       {/* Empty State */}
       <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-16 text-center">
         <div className="pb-6 p-16 text-center">
-          <div className="bg-gradient-to-br from-secondary to-accent p-6 rounded-3xl inline-flex mb-6">
+          <div className="bg-linear-to-br from-secondary to-accent p-6 rounded-3xl inline-flex mb-6">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"

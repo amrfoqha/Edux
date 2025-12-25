@@ -19,7 +19,7 @@ const ChatForm = () => {
           data-fg-elfm5="0.19:0.1988:/src/app/components/ui/card.tsx:66:5:1513:119:e:div::1"
         >
           <div
-            class="bg-gradient-to-br from-accent to-primary p-6 rounded-3xl inline-flex mb-6"
+            class="bg-linear-to-br from-accent to-primary p-6 rounded-3xl inline-flex mb-6"
             data-fg-cyo8131="1.44:11.7560:/src/app/pages/DashboardPage.tsx:296:19:13253:187:e:div"
           >
             <svg
