@@ -4,8 +4,6 @@ import Footer from '../Components/Footer';
 const HomePage = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans">
-      <Header />
-
       <main className="flex-grow">
         <section className="relative bg-gradient-to-br from-purple-50 via-white to-orange-50 py-16 md:py-24">
           <div className="container mx-auto px-6 flex flex-col md:flex-row items-center">
