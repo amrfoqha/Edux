@@ -1,9 +1,14 @@
+const express = require("express");
+const router = express.Router();
 const ResourceController = require('../controllers/resource.controller');
+const authMiddleware = require("../middlewares/auth.middleware");
 
-module.exports = app => {
-    app.get('/api/resources', ResourceController.findAllResources);
-    app.get('/api/resources/:id', ResourceController.findResource);
-    app.post('/api/resources', ResourceController.createResource);
-    app.patch('/api/resources/:id', ResourceController.updateResource);
-    app.delete('/api/resources/:id', ResourceController.deleteResource);
-}
+router.use(authMiddleware);
+
+router.get('/', ResourceController.findAllResources);
+router.get('/:id', ResourceController.findResource);
+router.post('/', ResourceController.createResource);
+router.patch('/:id', ResourceController.updateResource);
+router.delete('/:id', ResourceController.deleteResource);
+
+module.exports = router;

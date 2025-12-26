@@ -14,15 +14,15 @@ require("./config/mongoose.config");
 const userRoutes = require("./routes/user.routes");
 
 app.use("/api/users", userRoutes);
-require("./routes/resource.routes")(app);
-require("./routes/room.routes")(app);
-require("./routes/room_member.routes")(app);
-require("./routes/room_message.routes")(app);
-require("./routes/chat.routes")(app);
-require("./routes/favorite.routes")(app);
-require("./routes/notification.routes")(app);
-require("./routes/review.routes")(app);
-require("./routes/resource_request.routes")(app);
+app.use("/api/resources", require("./routes/resource.routes"));
+app.use("/api/rooms", require("./routes/room.routes"));
+app.use("/api/room-members", require("./routes/room_member.routes"));
+app.use("/api/room-messages", require("./routes/room_message.routes"));
+app.use("/api/chats", require("./routes/chat.routes"));
+app.use("/api/favorites", require("./routes/favorite.routes"));
+app.use("/api/notifications", require("./routes/notification.routes"));
+app.use("/api/reviews", require("./routes/review.routes"));
+app.use("/api/resource-requests", require("./routes/resource_request.routes"));
 require("./routes/auth.routes")(app);
 
 app.listen(port, () => console.log(`Listening on port: ${port}`));
