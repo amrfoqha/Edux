@@ -54,7 +54,6 @@ export function ResourceCard({ resource, onClick, showDetails = true }) {
                 className="cursor-pointer h-full flex flex-col overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl border border-border/50"
                 onClick={() => onClick?.(resource.id)}
             >
-                {/* Thumbnail */}
                 <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
                     {resource.imageUrl ? (
                         <div
@@ -71,7 +70,6 @@ export function ResourceCard({ resource, onClick, showDetails = true }) {
                         </div>
                     )}
 
-                    {/* Type badge */}
                     <div className="absolute top-3 right-3">
                         <Badge
                             className={`${badgeGradient} text-white border-0 shadow-lg px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide`}
@@ -81,7 +79,6 @@ export function ResourceCard({ resource, onClick, showDetails = true }) {
                     </div>
                 </div>
 
-                {/* Content */}
                 <CardContent className="flex-grow p-5 space-y-3">
                     <h3 className="font-bold text-lg leading-snug line-clamp-2">
                         {resource.title}
@@ -106,7 +103,6 @@ export function ResourceCard({ resource, onClick, showDetails = true }) {
                     )}
                 </CardContent>
 
-                {/* Footer */}
                 <CardFooter className="flex items-center justify-between px-5 py-4 border-t border-border/50 bg-muted/20">
                     <div className="flex items-center gap-1.5">
                         <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
