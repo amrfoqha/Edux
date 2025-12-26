@@ -11,7 +11,9 @@ app.use(cors());
 
 require("./config/mongoose.config");
 
-require("./routes/user.routes")(app);
+const userRoutes = require("./routes/user.routes");
+
+app.use("/api/users", userRoutes);
 require("./routes/resource.routes")(app);
 require("./routes/room.routes")(app);
 require("./routes/room_member.routes")(app);

@@ -15,11 +15,22 @@ export default function MobileNav({
         onClose();
     };
 
+    const navItems = [
+        { label: "Home", path: "/" },
+        { label: "Browse", path: "/browse" },
+        { label: "About", path: "/about" },
+    ];
+
+
     return (
         <div className="md:hidden border-t px-4 py-3 space-y-3">
-            {["landing", "browse", "about"].map((page) => (
-                <button key={page} onClick={() => go(page)} className="block w-full text-left">
-                    {page}
+            {navItems.map((item) => (
+                <button
+                    key={item.path}
+                    onClick={() => go(item.path)}
+                    className="block w-full text-left"
+                >
+                    {item.label}
                 </button>
             ))}
 
