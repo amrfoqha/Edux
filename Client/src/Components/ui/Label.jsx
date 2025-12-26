@@ -1,11 +1,9 @@
-"use client";
-
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 
-import { cn } from "./utils";
+import {cn} from "./utils";
 
-function Label({ className, ...props }) {
+function Label({className, ...props}) {
     return (
         <LabelPrimitive.Root
             data-slot="label"
@@ -18,4 +16,4 @@ function Label({ className, ...props }) {
     );
 }
 
-export { Label };
+export {Label};
