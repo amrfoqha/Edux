@@ -6,18 +6,19 @@ import DesktopNav from "../Components/nav/DesktopNav.jsx";
 import {Button} from "../Components/ui/Button.jsx";
 import MobileNav from "../Components/nav/MobileNav.jsx";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "../Hooks/useAuth.jsx";
 
 
 export function Navbar({
                            currentPage,
                            isLoggedIn,
-                           onLogout,
                            notifications =[],
                            onMarkAsRead,
                        }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const onNavigate = useNavigate();
+    const {logout} = useAuth();
     return (
         <motion.nav
             initial={{y: -100}}
@@ -31,7 +32,7 @@ export function Navbar({
                     currentPage={currentPage}
                     onNavigate={onNavigate}
                     isLoggedIn={isLoggedIn}
-                    onLogout={onLogout}
+                    onLogout={logout}
                     notifications={notifications}
                     onMarkAsRead={onMarkAsRead}
                 />
@@ -52,7 +53,7 @@ export function Navbar({
                 onClose={() => setMobileMenuOpen(false)}
                 onNavigate={onNavigate}
                 isLoggedIn={isLoggedIn}
-                onLogout={onLogout}
+                onLogout={logout}
             />
         </motion.nav>
     );

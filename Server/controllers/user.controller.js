@@ -29,10 +29,9 @@ module.exports.createUser = async (req, res) => {
         if (error.name === "ValidationError") {
             return res.status(400).json(error.errors);
         }
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({message: "Server error"});
     }
 };
-
 
 
 module.exports.updateUser = async (req, res) => {
@@ -40,14 +39,14 @@ module.exports.updateUser = async (req, res) => {
         const resp = await User.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true, runValidators: true }
+            {new: true, runValidators: true}
         );
         res.json(resp);
     } catch (error) {
         if (error.name === "ValidationError") {
             return res.status(400).json(error.errors);
         }
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({message: "Server error"});
     }
 };
 
@@ -60,3 +59,18 @@ module.exports.deleteUser = async (req, res) => {
         return res.status(400).send({error: error.message})
     }
 }
+
+module.exports.getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+        console.log(user)
+        if (!user) {
+            return res.status(404).json({message: "User not found"});
+        }
+
+        res.json(user);
+    } catch {
+        res.status(500).json({message: "Server error"});
+    }
+};
+
