@@ -2,12 +2,13 @@ import { Navbar } from "./Layouts/Navbar.jsx";
 import { useAuth } from "./Hooks/useAuth.jsx";
 import AuthRoutes from "./Routes/AuthRoutes.jsx";
 import UnAuthRoutes from "./Routes/UnAuthRoutes.jsx";
+import LoadingOverlay from "./Components/LoadingOverlay.jsx";
 
 function App() {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingOverlay />;
   }
 
   return (
