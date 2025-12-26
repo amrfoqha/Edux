@@ -1,9 +1,14 @@
+const express = require("express");
+const router = express.Router();
 const RoomController = require('../controllers/room.controller');
+const authMiddleware = require("../middlewares/auth.middleware");
 
-module.exports = app => {
-    app.get('/api/rooms', RoomController.findAllRooms);
-    app.get('/api/rooms/:id', RoomController.findRoom);
-    app.post('/api/rooms', RoomController.createRoom);
-    app.patch('/api/rooms/:id', RoomController.updateRoom);
-    app.delete('/api/rooms/:id', RoomController.deleteRoom);
-}
+router.use(authMiddleware);
+
+router.get('/', RoomController.findAllRooms);
+router.get('/:id', RoomController.findRoom);
+router.post('/', RoomController.createRoom);
+router.patch('/:id', RoomController.updateRoom);
+router.delete('/:id', RoomController.deleteRoom);
+
+module.exports = router;
