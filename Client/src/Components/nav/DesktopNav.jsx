@@ -27,7 +27,7 @@ export default function DesktopNav({
                 <button
                     key={item.path}
                     onClick={() => onNavigate(item.path)}
-                    className={linkClass(item.path)}
+                    className={linkClass(item.label)}
                 >
                     {item.label}
                 </button>

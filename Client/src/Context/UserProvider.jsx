@@ -1,43 +1,78 @@
 import { useState, useEffect } from "react";
-import { UserContext } from "./UserContext.jsx";
-import { createUser, loginUser, getCurrentUser } from "../API/UserAPI";
+import { UserContext } from "./UserContext";
+import {
+    createUser,
+    loginUser,
+    getCurrentUser,
+    refreshAccessToken as refreshAccessTokenApi ,
+} from "../API/UserAPI";
 import api from "../API/baseUrl";
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(null);
+    const [accessToken, setAccessToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const setAuth = (token, user) => {
-        setToken(token);
+
+    const setAuth = (accessToken, refreshToken, user) => {
+        setAccessToken(accessToken);
         setUser(user);
-        localStorage.setItem("token", token);
-        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
     };
 
     const clearAuth = () => {
-        setToken(null);
+        setAccessToken(null);
         setUser(null);
-        localStorage.removeItem("token");
+
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+
         delete api.defaults.headers.common["Authorization"];
     };
 
+
+    const refreshAccessToken = async () => {
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (!refreshToken) throw new Error("No refresh token");
+
+        const { accessToken } = await refreshAccessTokenApi(refreshToken);
+
+        setAccessToken(accessToken);
+        localStorage.setItem("accessToken", accessToken);
+        api.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+
+        return accessToken;
+    };
+
+
     useEffect(() => {
         const initAuth = async () => {
-            const storedToken = localStorage.getItem("token");
-            if (!storedToken) {
+            const storedAccessToken = localStorage.getItem("accessToken");
+            if (!storedAccessToken) {
                 setLoading(false);
                 return;
             }
 
-            api.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
+            api.defaults.headers.common["Authorization"] =
+                `Bearer ${storedAccessToken}`;
 
             try {
                 const userData = await getCurrentUser();
-                setToken(storedToken);
+                setAccessToken(storedAccessToken);
                 setUser(userData);
-            } catch {
-                clearAuth();
+            } catch (error) {
+                // Access token expired
+                try {
+                    await refreshAccessToken();
+                    const userData = await getCurrentUser();
+                    setUser(userData);
+                } catch {
+                    clearAuth();
+                }
             } finally {
                 setLoading(false);
             }
@@ -48,8 +83,12 @@ export const UserProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const { token, user } = await loginUser(email, password);
-            setAuth(token, user);
+            const { accessToken, refreshToken } = await loginUser(email, password);
+            setAuth(accessToken, refreshToken, null);
+            const userData = await getCurrentUser();
+            setUser(userData);
+
+            setAuth(accessToken, refreshToken, userData);
             return { success: true };
         } catch (error) {
             return {
@@ -61,8 +100,11 @@ export const UserProvider = ({ children }) => {
 
     const register = async (userData) => {
         try {
-            const { token, user } = await createUser(userData);
-            setAuth(token, user);
+            const { accessToken, refreshToken } = await createUser(userData);
+            setAuth(accessToken, refreshToken, null);
+            const userData = await getCurrentUser();
+            setUser(userData);
+
             return { success: true };
         } catch (error) {
             return {
@@ -74,29 +116,17 @@ export const UserProvider = ({ children }) => {
 
     const logout = () => clearAuth();
 
-    const refreshUser = async () => {
-        try {
-            const userData = await getCurrentUser();
-            setUser(userData);
-            return { success: true };
-        } catch {
-            clearAuth();
-            return { success: false };
-        }
-    };
-
-    const isAuthenticated = !!token && !!user;
+    const isAuthenticated = !!accessToken && !!user;
 
     return (
         <UserContext.Provider
             value={{
                 user,
-                token,
+                accessToken,
                 loading,
                 login,
                 register,
                 logout,
-                refreshUser,
                 isAuthenticated,
             }}
         >

@@ -1,9 +1,16 @@
-const UserController = require('../controllers/user.controller');
+const express = require("express");
+const router = express.Router();
+const UserController = require("../controllers/user.controller");
+const authMiddleware = require("../middlewares/auth.middleware");
 
-module.exports = app => {
-    app.get('/api/users', UserController.findAllUsers);
-    app.get('/api/users/:id', UserController.findUser);
-    app.post('/api/users', UserController.createUser);
-    app.patch('/api/users/:id', UserController.updateUser);
-    app.delete('/api/users/:id', UserController.deleteUser);
-}
+router.use(authMiddleware);
+
+router.get("/me", UserController.getMe);
+
+router.get("/", UserController.findAllUsers);
+router.get("/:id", UserController.findUser);
+router.post("/", UserController.createUser);
+router.patch("/:id", UserController.updateUser);
+router.delete("/:id", UserController.deleteUser);
+
+module.exports = router;

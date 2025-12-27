@@ -1,9 +1,14 @@
+const express = require("express");
+const router = express.Router();
 const RoomMessageController = require('../controllers/room_message.controller');
+const authMiddleware = require("../middlewares/auth.middleware");
 
-module.exports = app => {
-    app.get('/api/room-messages', RoomMessageController.findAllMessages);
-    app.get('/api/room-messages/:id', RoomMessageController.findOneMessage);
-    app.post('/api/room-messages', RoomMessageController.createMessage);
-    app.patch('/api/room-messages/:id', RoomMessageController.updateMessage);
-    app.delete('/api/room-messages/:id', RoomMessageController.deleteMessage);
-}
+router.use(authMiddleware);
+
+router.get('/', RoomMessageController.findAllMessages);
+router.get('/:id', RoomMessageController.findOneMessage);
+router.post('/', RoomMessageController.createMessage);
+router.patch('/:id', RoomMessageController.updateMessage);
+router.delete('/:id', RoomMessageController.deleteMessage);
+
+module.exports = router;
