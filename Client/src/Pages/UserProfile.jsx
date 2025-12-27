@@ -1,12 +1,28 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UploadForm } from "../Components/UploadForm";
 import FavoriteForm from "../Components/FavoriteForm";
 import ChatForm from "../Components/ChatForm";
 import AiPicksForm from "../Components/AiPicksForm";
+import { useAuth } from "../Hooks/useAuth";
+import { getCurrentUser } from "../API/UserAPI";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("uploads");
+  const [user, setUser] = useState(null);
+  const [refresh, setRefresh] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        setUser(user);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchUser();
+  }, [refresh]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
@@ -49,26 +65,30 @@ const UserProfile = () => {
               {/* User Info */}
               <div className="flex-1 ml-42">
                 <h1 className="text-5xl font-semibold bg-linear-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-transparent">
-                  Student Name
+                  {user?.name}
                 </h1>
 
                 <div className="flex flex-wrap gap-2 mt-3  ">
                   <Badge
-                    text="University"
+                    text={user?.university}
                     BackColor="bg-secondary"
                     color="text-white"
                   />
-                  <Badge text="Faculty" />
-                  <Badge text="Department" />
+                  <Badge text={user?.faculty} />
+                  <Badge text={user?.department} />
                 </div>
                 <p className="opacity-90 text-xl text-secondary mt-2">
-                  user@email.com
+                  {user?.email}
                 </p>
               </div>
 
               {/* Stats */}
               <div className="flex gap-4   ">
-                <StatCard label="Uploads" value="0" highlight />
+                <StatCard
+                  label="Uploads"
+                  value={user?.resources?.length}
+                  highlight
+                />
                 <StatCard label="Favorites" value="0" highlight />
                 <StatCard label="Downloads" value="128" highlight />
               </div>
@@ -108,7 +128,9 @@ const UserProfile = () => {
 
         {/* ===== Content ===== */}
         <section className="animate-in fade-in zoom-in duration-900 ">
-          {activeTab === "uploads" && <UploadForm />}
+          {activeTab === "uploads" && (
+            <UploadForm refresh={refresh} setRefresh={setRefresh} />
+          )}
           {activeTab === "favorites" && <FavoriteForm />}
           {activeTab === "chat" && <ChatForm />}
           {activeTab === "ai-picks" && <AiPicksForm />}

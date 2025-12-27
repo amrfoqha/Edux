@@ -9,7 +9,7 @@ export default function AuthRoutes() {
       <Route path="/" element={<HomePage />} />
       <Route path="/chat" element={<ChatPage />} />
       <Route path="/profile" element={<UserProfile />} />
-      {/* <Route path="*" element={<Navigate to="/" replace/>}/> */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

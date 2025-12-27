@@ -10,9 +10,14 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { Badge } from "../components/ui/badge";
+import { uploadResource } from "../API/ResouceAPI";
 
-export default function FullFileUpload({ setCancel }) {
-  const [files, setFiles] = useState([]);
+export default function FullFileUpload({
+  setCancel,
+  setForm,
+  handleSubmit,
+  validation,
+}) {
   const [previews, setPreviews] = useState({});
   const [suggestedTags, setSuggestedTags] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -22,16 +27,15 @@ export default function FullFileUpload({ setCancel }) {
   const canvasRef = useRef(null);
   const [showCamera, setShowCamera] = useState(false);
   const [uploadType, setUploadType] = useState("");
+  const [file, setFile] = useState([]);
 
-  // Handle file selection
   const handleFileChange = (e) => {
     e.preventDefault();
     const selectedFiles = e.target.files;
     if (!selectedFiles) return;
-
     const newFiles = Array.from(selectedFiles);
-    setFiles((prev) => [...prev, ...newFiles]);
-
+    console.log(newFiles);
+    setFile((prev) => [...prev, ...newFiles]);
     newFiles.forEach((file) => {
       if (file.type.startsWith("image/")) {
         const reader = new FileReader();
@@ -39,6 +43,7 @@ export default function FullFileUpload({ setCancel }) {
           setPreviews((prev) => ({ ...prev, [file.name]: reader.result }));
         };
         reader.readAsDataURL(file);
+        // setFile((prev) => [...prev, file]);
       }
     });
 
@@ -50,11 +55,12 @@ export default function FullFileUpload({ setCancel }) {
         "CS101",
         "Lecture Notes",
       ]);
+      setForm((prev) => ({ ...prev, tags: suggestedTags }));
     }, 500);
   };
 
   const removeFile = (fileName) => {
-    setFiles((prev) => prev.filter((f) => f.name !== fileName));
+    setFile((prev) => prev.filter((file) => file.name !== fileName));
     setPreviews((prev) => {
       const newPreviews = { ...prev };
       delete newPreviews[fileName];
@@ -98,7 +104,10 @@ export default function FullFileUpload({ setCancel }) {
           const capturedFile = new File([blob], `captured-${Date.now()}.jpg`, {
             type: "image/jpeg",
           });
-          setFiles((prev) => [...prev, capturedFile]);
+          setForm((prev) => ({
+            ...prev,
+            files: [...prev.files, capturedFile],
+          }));
           setPreviews((prev) => ({
             ...prev,
             [capturedFile.name]: canvas.toDataURL("image/jpeg"),
@@ -119,15 +128,34 @@ export default function FullFileUpload({ setCancel }) {
     setShowCamera(false);
   };
 
-  const simulateUpload = (e) => {
+  const uploadFilesToServer = async (e) => {
     e.preventDefault();
-    setUploading(true);
-    setTimeout(() => {
-      alert("Files uploaded successfully!");
-      setUploading(false);
-      setFiles([]);
+    if (file.length === 0) return;
+    console.log("form.files", file);
+
+    try {
+      setUploading(true);
+
+      const formData = new FormData();
+
+      // append files
+      file.forEach((file) => {
+        formData.append("files", file);
+      });
+
+      const res = await uploadResource(formData);
+      setForm((prev) => ({
+        ...prev,
+        files: [...prev.files, ...res.files.map((file) => file.path)],
+      }));
+
       setPreviews({});
-    }, 1500);
+    } catch (err) {
+      console.error(err);
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -211,13 +239,13 @@ export default function FullFileUpload({ setCancel }) {
         </div>
       )}
 
-      <canvas ref={canvasRef} className="border-dashed border-2 w-full" />
+      <canvas ref={canvasRef} className="w-full" />
 
       {/* File Preview List */}
       <div className="space-y-2">
-        {files.map((file) => (
+        {file.map((file, index) => (
           <div
-            key={file.name}
+            key={index}
             className="flex items-center justify-between p-2 border rounded-lg"
           >
             <div className="flex items-center gap-4">
@@ -245,7 +273,12 @@ export default function FullFileUpload({ setCancel }) {
             <Badge
               key={tag}
               className="cursor-pointer"
-              onClick={() => alert(`Tag added: ${tag}`)}
+              onClick={() => {
+                setForm((prev) => ({
+                  ...prev,
+                  tags: [...prev.tags, tag],
+                }));
+              }}
             >
               <Sparkles className="w-4 h-4 mr-1" /> {tag}
             </Badge>
@@ -255,28 +288,45 @@ export default function FullFileUpload({ setCancel }) {
 
       {/* Upload Button */}
 
-      <div className="flex gap-4 items-center">
-        <Button
-          onClick={simulateUpload}
-          disabled={files.length === 0 || uploading}
-          className="w-full h-12 mt-4"
-          variant="outline"
-        >
-          {uploading ? (
-            "Uploading..."
-          ) : (
-            <>
-              <Upload className="mr-2" /> Upload Files
-            </>
-          )}
-        </Button>
-        <Button
-          variant="outline"
-          className="h-12 mt-4"
-          onClick={() => setCancel(false)}
-        >
-          Cancel
-        </Button>
+      <div className=" flex-col gap-4 items-center">
+        <div className="flex gap-4">
+          <Button
+            onClick={uploadFilesToServer}
+            disabled={file.length === 0 || uploading}
+            className="w-full h-12 mt-4"
+            variant="outline"
+          >
+            {uploading ? (
+              "Uploading..."
+            ) : (
+              <>
+                <Upload className="mr-2" /> Upload Files
+              </>
+            )}
+          </Button>
+          <Button
+            variant="outline"
+            className="h-12 mt-4"
+            onClick={() => setCancel(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+        <div className="mt-4 flex justify-center">
+          <Button
+            onClick={handleSubmit}
+            className="h-12 mt-4"
+            variant="outline"
+            disabled={
+              validation.title ||
+              validation.description ||
+              validation.department ||
+              uploading
+            }
+          >
+            Submit New Resource
+          </Button>
+        </div>
       </div>
     </div>
   );
