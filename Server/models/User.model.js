@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema(
     university: { type: String, required: [true, "University is required"] },
     faculty: { type: String, required: [true, "Faculty is required"] },
     department: { type: String, required: [true, "Department is required"] },
+    resources: [{ type: mongoose.Schema.Types.ObjectId, ref: "Resource" }],
   },
   {
     timestamps: true,

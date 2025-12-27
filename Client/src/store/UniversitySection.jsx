@@ -1,3 +1,12 @@
+export const universities = [
+  "An-Najah National University",
+  "Birzeit University",
+  "Al-Quds University",
+  "Al-Quds-Open University",
+  "Al-Aqsa University",
+  "Arab American University",
+  "Al-Azhar University",
+];
 export const faculties = [
   "Faculty of Engineering",
   "Faculty of Medicine",
