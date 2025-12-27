@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 
-export default function FullFileUpload() {
+export default function FullFileUpload({ setCancel }) {
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState({});
   const [suggestedTags, setSuggestedTags] = useState([]);
@@ -148,8 +148,7 @@ export default function FullFileUpload() {
       <div className="flex gap-4 ">
         {uploadType === "document" && (
           <Button
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() => {
               fileInputRef.current?.click();
             }}
             className="flex-1 text-black bg-white hover:bg-yellow-300"
@@ -160,8 +159,7 @@ export default function FullFileUpload() {
         {uploadType === "image" && (
           <>
             <Button
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={() => {
                 imageInputRef.current?.click();
               }}
               className="flex-1 text-black bg-white hover:bg-yellow-300"
@@ -272,7 +270,11 @@ export default function FullFileUpload() {
             </>
           )}
         </Button>
-        <Button variant="outline" className="h-12 mt-4">
+        <Button
+          variant="outline"
+          className="h-12 mt-4"
+          onClick={() => setCancel(false)}
+        >
           Cancel
         </Button>
       </div>

@@ -57,7 +57,7 @@ export const UploadForm = () => {
           </div>
         </div>
       )}
-      {open && <UploadResourceComponent />}
+      {open && <UploadResourceComponent setOpen={setOpen} />}
     </section>
   );
 };

@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 import { faculties, departments } from "../store/UniversitySection";
 import FullFileUpload from "./FullFileUpload";
 
-const UploadResourceComponent = () => {
+const UploadResourceComponent = ({ setOpen }) => {
   const [faculty, setFaculty] = useState("Faculty of Engineering");
   const [department, setDepartment] = useState("");
+  const [cancel, setCancel] = useState(true);
+  useEffect(() => {
+    setOpen(cancel);
+  }, [cancel]);
 
   return (
     <>
@@ -38,7 +42,11 @@ const UploadResourceComponent = () => {
           </div>
         </div>
         <div>
-          <form action="" className="text-start mt-8 ml-5">
+          <form
+            action=""
+            className="text-start mt-8 ml-5"
+            onSubmit={(e) => e.preventDefault()}
+          >
             <h1 className="flex text-2xl items-center gap-1 font-semibold text-start">
               <div className="bg-linear-to-b from-purple-500 via-pink-500 to-orange-400 w-[3px] h-6 rounded-xl"></div>
               Basic Information
@@ -114,7 +122,7 @@ const UploadResourceComponent = () => {
             </div>
 
             <div>
-              <FullFileUpload />
+              <FullFileUpload setCancel={setCancel} />
             </div>
           </form>
         </div>
