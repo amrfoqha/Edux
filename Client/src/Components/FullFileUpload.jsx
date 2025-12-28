@@ -278,6 +278,8 @@ export default function FullFileUpload({
                   ...prev,
                   tags: [...prev.tags, tag],
                 }));
+                setSuggestedTags((prev) => prev.filter((t) => t !== tag));
+                ("style={{textDecoration: 'line-through'}}");
               }}
             >
               <Sparkles className="w-4 h-4 mr-1" /> {tag}

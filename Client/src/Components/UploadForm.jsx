@@ -2,15 +2,34 @@ import React, { useEffect, useState } from "react";
 import UploadResourceComponent from "./UploadResourceComponent";
 import { useAuth } from "../Hooks/useAuth";
 import { ResourceCard } from "../Components/shared/ResourceCard";
+import UsePagination from "../Hooks/usePagination";
+import { getUserResourcesPage } from "../API/UserAPI";
 
 export const UploadForm = ({ refresh, setRefresh }) => {
   const [open, setOpen] = useState(false);
   const [flag, setFlag] = useState(refresh);
+  const [currentPage, setCurrentPage] = useState(1);
   const { user } = useAuth();
+  const [allResources, setAllResources] = useState([]);
+  const [totalItems, setTotalItems] = useState(user.resources.length);
+  const [limit, setLimit] = useState(9);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     setRefresh(flag);
-  }, [flag]);
+    const fetchData = async () => {
+      try {
+        const res = await getUserResourcesPage(user._id, currentPage, limit);
+        console.log(res);
+        setAllResources(res.data);
+        setTotalItems(res.totalItems);
+        setTotalPages(res.totalPages);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, [flag, currentPage]);
 
   const FormOpen = () => {
     setOpen(!open);
@@ -33,10 +52,10 @@ export const UploadForm = ({ refresh, setRefresh }) => {
 
       {/* Empty State */}
       {!open &&
-        (user.resources.length === 0 ? (
+        (totalItems === 0 ? (
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-16 text-center">
             <div className="[&amp;:last-child]:pb-6 p-16 text-center">
-              <div className="bg-gradient-to-br from-primary to-secondary p-6 rounded-3xl inline-flex mb-6">
+              <div className="bg-linear-to-br from-primary to-secondary p-6 rounded-3xl inline-flex mb-6">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -67,8 +86,8 @@ export const UploadForm = ({ refresh, setRefresh }) => {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {user.resources.map((resource) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {allResources?.map((resource) => {
               return (
                 <ResourceCard
                   key={resource._id}
@@ -86,6 +105,18 @@ export const UploadForm = ({ refresh, setRefresh }) => {
           setFlag={setFlag}
           flag={flag}
         />
+      )}
+
+      {!open && totalItems > 0 && (
+        <div className="mt-6 w-full flex justify-center">
+          <UsePagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalItems={totalItems}
+            limit={limit}
+            totalPages={totalPages}
+          />
+        </div>
       )}
     </section>
   );

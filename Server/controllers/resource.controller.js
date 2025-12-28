@@ -62,3 +62,51 @@ module.exports.deleteResource = async (req, res) => {
     return res.status(400).send({ error: error.message });
   }
 };
+
+module.exports.getResourcesByPage = async (req, res) => {
+  try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit) || 9, 1);
+    const skip = (page - 1) * limit;
+    console.log(req.query);
+
+    const { q, type, university, faculty, department } = req.query;
+    console.log(q, type, university, faculty, department);
+    const filter = {};
+
+    if (q && q.trim()) {
+      const regex = new RegExp(q.trim(), "i");
+      filter.$or = [
+        { title: regex },
+        { description: regex },
+        { tags: { $in: [regex] } },
+      ];
+    }
+
+    if (type) filter.type = type;
+    if (university) filter.university = university;
+    if (faculty) filter.faculty = faculty;
+    if (department) filter.department = department;
+
+    const totalItems = await Resource.countDocuments(filter);
+
+    const resources = await Resource.find(filter)
+      .populate("uploader", "name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      currentPage: page,
+      limit,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      hasNextPage: page * limit < totalItems,
+      hasPrevPage: page > 1,
+      data: resources,
+    });
+  } catch (error) {
+    console.error("Pagination Error:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};

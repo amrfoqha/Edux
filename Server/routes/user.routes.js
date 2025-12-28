@@ -8,6 +8,7 @@ router.use(authMiddleware);
 router.get("/me", UserController.getMe);
 
 router.get("/", UserController.findAllUsers);
+router.get("/:id/resources/page", UserController.getUserResourcesPage);
 router.get("/:id", UserController.findUser);
 router.post("/", UserController.createUser);
 router.patch("/:id", UserController.updateUser);

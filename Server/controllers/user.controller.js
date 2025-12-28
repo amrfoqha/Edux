@@ -70,3 +70,55 @@ module.exports.getMe = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+module.exports.getUserResourcesPage = async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 6;
+    const skip = (page - 1) * limit;
+
+    const searchQuery = req.query.q || "";
+    const typeFilter = req.query.type || "";
+
+    // base filter: only user's resources
+    let filter = {
+      uploader: userId,
+    };
+
+    // search
+    if (searchQuery) {
+      filter.$or = [
+        { title: { $regex: searchQuery, $options: "i" } },
+        { description: { $regex: searchQuery, $options: "i" } },
+        { tags: { $regex: searchQuery, $options: "i" } },
+      ];
+    }
+
+    // filter by type
+    if (typeFilter) {
+      filter.type = typeFilter;
+    }
+
+    const totalItems = await Resource.countDocuments(filter);
+
+    const resources = await Resource.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      page,
+      limit,
+      totalItems,
+      totalPages: Math.ceil(totalItems / limit),
+      hasNextPage: page < Math.ceil(totalItems / limit),
+      hasPrevPage: page > 1,
+      data: resources,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
