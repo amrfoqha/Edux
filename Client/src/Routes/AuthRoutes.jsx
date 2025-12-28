@@ -5,6 +5,9 @@ import UserProfile from "../Pages/UserProfile";
 import DirectMessagePage from "../Pages/DirectMessagePage.jsx";
 import GroupChatPage from "../Pages/GroupChatPage.jsx";
 import {useAuth} from "../Hooks/useAuth.jsx";
+import BrowesResourcePage from "../Pages/BrowesResourcePage";
+import ResourceDetailsPage from "../Pages/ResourceDetailsPage";
+
 
 export default function AuthRoutes() {
     const { user } = useAuth();
@@ -15,7 +18,10 @@ export default function AuthRoutes() {
             <Route path="/dm/:otherUserId" element={<DirectMessagePage currentUser={user} />} />
             <Route path="/group" element={<GroupChatPage currentUser={user}/>} />
             <Route path="/profile" element={<UserProfile/>}/>
+            <Route path="/browse" element={<BrowesResourcePage />} />
             <Route path="*" element={<Navigate to="/" replace/>}/>
+            <Route path="/resources/:id" element={<ResourceDetailsPage />} />
         </Routes>
     );
+
 }

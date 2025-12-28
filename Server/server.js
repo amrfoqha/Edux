@@ -27,6 +27,7 @@ app.use("/api/notifications", require("./routes/notification.routes"));
 app.use("/api/reviews", require("./routes/review.routes"));
 app.use("/api/resource-requests", require("./routes/resource_request.routes"));
 require("./routes/auth.routes")(app);
+app.use("/api/uploads", require("./routes/upload.routes"));
 
 const server = http.createServer(app);
 const io = new Server(server, {
