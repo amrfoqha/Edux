@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema(
     university: { type: String, required: [true, "University is required"] },
     faculty: { type: String, required: [true, "Faculty is required"] },
     department: { type: String, required: [true, "Department is required"] },
+    isOnline: { type: Boolean, default: false },
   },
   {
     timestamps: true,
