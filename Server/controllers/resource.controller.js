@@ -68,10 +68,9 @@ module.exports.getResourcesByPage = async (req, res) => {
     const page = Math.max(parseInt(req.query.page) || 1, 1);
     const limit = Math.max(parseInt(req.query.limit) || 9, 1);
     const skip = (page - 1) * limit;
-    console.log(req.query);
 
     const { q, type, university, faculty, department } = req.query;
-    console.log(q, type, university, faculty, department);
+    // console.log(q, type, university, faculty, department);
     const filter = {};
 
     if (q && q.trim()) {
