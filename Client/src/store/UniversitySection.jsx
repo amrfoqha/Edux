@@ -22,7 +22,6 @@ export const faculties = [
   "Faculty of Sharia",
   "Faculty of Mass Communication",
 ];
-
 export const departments = {
   "Faculty of Engineering": [
     "Computer Engineering",

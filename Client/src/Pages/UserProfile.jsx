@@ -127,14 +127,18 @@ const UserProfile = () => {
         </section>
 
         {/* ===== Content ===== */}
-        <section className="animate-in fade-in zoom-in duration-900 ">
+        <motion.section
+          initial={{ opacity: 0, y: -20, scale: 0.88 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.4 }}
+        >
           {activeTab === "uploads" && (
             <UploadForm refresh={refresh} setRefresh={setRefresh} />
           )}
           {activeTab === "favorites" && <FavoriteForm />}
           {activeTab === "chat" && <ChatForm />}
           {activeTab === "ai-picks" && <AiPicksForm />}
-        </section>
+        </motion.section>
       </main>
     </div>
   );

@@ -60,3 +60,23 @@ export const getResources = async () => {
     throw error;
   }
 };
+
+export const getResourcesByPage = async (page, limit, params) => {
+  const {
+    q = "",
+    type = "",
+    university = "",
+    faculty = "",
+    department = "",
+  } = params;
+  try {
+    const response = await api.get(
+      `/resources/page?page=${page}&limit=${limit}&q=${q}&type=${type}&university=${university}&faculty=${faculty}&department=${department}`
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error getting resources by page:", error);
+    throw error;
+  }
+};
