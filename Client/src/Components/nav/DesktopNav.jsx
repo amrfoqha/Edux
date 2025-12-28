@@ -1,15 +1,16 @@
 import {MessageCircle} from "lucide-react";
 import NotificationsMenu from "./NotificationsMenu";
 import {Button} from "../ui/Button.jsx";
+import {useState} from "react";
 
 export default function DesktopNav({
-                                       currentPage,
                                        isLoggedIn,
                                        onNavigate,
                                        onLogout,
                                        notifications,
                                        onMarkAsRead,
                                    }) {
+    const [currentPage, setCurrentPage] = useState("")
     const linkClass = (page) =>
         currentPage === page
             ? "text-primary"
@@ -26,7 +27,7 @@ export default function DesktopNav({
             {navItems.map((item) => (
                 <button
                     key={item.path}
-                    onClick={() => onNavigate(item.path)}
+                    onClick={() => {onNavigate(item.path); setCurrentPage(item.label)}}
                     className={linkClass(item.label)}
                 >
                     {item.label}
@@ -36,7 +37,7 @@ export default function DesktopNav({
             {isLoggedIn ? (
                 <>
                     <button
-                        onClick={() => onNavigate("/chat")}
+                        onClick={() => {onNavigate("/chat"); setCurrentPage("Chat")}}
                         className={`flex items-center gap-2 ${linkClass("/chat")}`}
                     >
                         <MessageCircle className="h-5 w-5" />

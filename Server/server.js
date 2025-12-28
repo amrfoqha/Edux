@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const http = require("http");
+const { Server } = require("socket.io");
+const socketHandler = require("./socket");
 
 require("dotenv").config();
 
@@ -26,4 +29,16 @@ app.use("/api/resource-requests", require("./routes/resource_request.routes"));
 require("./routes/auth.routes")(app);
 app.use("/api/uploads", require("./routes/upload.routes"));
 
-app.listen(port, () => console.log(`Listening on port: ${port}`));
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+    },
+});
+
+app.set("io", io);
+
+socketHandler(io);
+
+server.listen(port, () => console.log(`Listening on port: ${port}`));

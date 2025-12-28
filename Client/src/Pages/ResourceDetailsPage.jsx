@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getResourceById } from "../API/ResouceAPI";
+import {getResource} from "../API/ResouceAPI";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 
@@ -10,7 +10,7 @@ const ResourceDetailsPage = () => {
 
     useEffect(() => {
         const fetchResource = async () => {
-            const data = await getResourceById(id);
+            const data = await getResource(id);
             setResource(data);
         };
         fetchResource();

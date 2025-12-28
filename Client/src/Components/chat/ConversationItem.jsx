@@ -13,7 +13,7 @@ export default function ConversationItem({ conversation, onClick }) {
             <div className="p-6 flex items-center gap-4">
                 <div className="relative">
                     <Avatar className="h-16 w-16">
-                        <AvatarFallback className="bg-gradient-to-br from-secondary to-accent text-white text-xl">
+                        <AvatarFallback className="bg-linear-to-br from-secondary to-accent text-white text-xl">
                             {name?.charAt(0)}
                         </AvatarFallback>
                     </Avatar>

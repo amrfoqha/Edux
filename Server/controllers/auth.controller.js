@@ -26,6 +26,7 @@ const generateRefreshToken = async (userId) => {
 exports.register = async (req, res) => {
     const { name, email, password, university, faculty, department, confirmPassword } = req.body;
 
+    console.log(req.body);
     const existingUser = await User.findOne({ email });
     if (existingUser) {
         return res.status(400).json({ message: "User already exists" });
@@ -39,6 +40,7 @@ exports.register = async (req, res) => {
         university,
         faculty,
         department,
+        isOnline: true,
     });
 
     const accessToken = generateAccessToken(user);
@@ -62,6 +64,10 @@ exports.login = async (req, res) => {
     if (!isMatch) {
         return res.status(400).json({ message: "Invalid email or password" });
     }
+
+    // Set user as online
+    user.isOnline = true;
+    await user.save();
 
     const accessToken = generateAccessToken(user);
     const refreshToken = await generateRefreshToken(user._id);
@@ -91,4 +97,24 @@ exports.refresh = async (req, res) => {
     );
 
     res.json({ accessToken });
+};
+
+exports.logout = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const io = req.app.get("io");
+        if (io?.forceLogoutUser) {
+            await io.forceLogoutUser(userId);
+        } else if (io) {
+            await User.findByIdAndUpdate(userId, { isOnline: false });
+            io.emit("user:status", { userId, isOnline: false });
+        } else {
+            await User.findByIdAndUpdate(userId, { isOnline: false });
+        }
+
+        res.json({ message: "Logged out successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Logout failed" });
+    }
 };

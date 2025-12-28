@@ -81,10 +81,12 @@
 // };
 
 const authController = require("../controllers/auth.controller");
+const authMiddleware = require("../middlewares/auth.middleware");
 
 module.exports = app => {
 
   app.post("/api/auth/register", authController.register);
   app.post("/api/auth/login", authController.login);
+  app.post("/api/auth/logout", authMiddleware, authController.logout);
   app.post("/refresh", authController.refresh);
 }
