@@ -50,7 +50,7 @@ export function ResourceCard({ resource, onClick, showDetails = true }) {
       className="h-full"
     >
       <Card
-        className="cursor-pointer h-auto w-[85%] flex flex-col overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl border border-border/50"
+        className="cursor-pointer h-auto w-full flex flex-col overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl border border-border/50"
         onClick={() => onClick?.(resource.id)}
       >
         <div className="relative w-full" style={{ paddingTop: "56.25%" }}>

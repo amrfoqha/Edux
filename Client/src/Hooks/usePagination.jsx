@@ -7,7 +7,6 @@ const UsePagination = ({
   limit,
   totalPages,
 }) => {
-  console.log(totalPages + " " + totalItems + " " + limit);
   return (
     <Pagination
       count={totalPages}
