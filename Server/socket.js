@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const Chat = require("./models/chat.model");
 const User = require("./models/User.model");
+const RoomMember = require("./models/room_member.model");
+const RoomMessage = require("./models/room_message.model");
 
 const EVENTS = Object.freeze({
     PRESENCE_SNAPSHOT: "presence:snapshot",
@@ -10,10 +12,18 @@ const EVENTS = Object.freeze({
     DM_SEND: "dm:send",
     DM_RECEIVE: "dm:receive",
     DM_NOTIFICATION: "dm:notification",
+
+    JOIN_ROOM: "room:join",
+    LEAVE_ROOM: "room:leave",
+    ROOM_SEND: "room:send",
+    ROOM_RECEIVE: "room:receive",
+    ROOM_NOTIFICATION: "room:notification",
 });
 
 const USER_ROOM = (userId) => `user:${userId}`;
 const DM_ROOM = (a, b) => `dm:${[String(a), String(b)].sort().join("-")}`;
+
+const ROOM_ROOM = (roomId) => `room:${roomId}`;
 
 module.exports = function (io) {
     // userId -> Set(socketId) (supports multi-tab)
@@ -137,6 +147,87 @@ module.exports = function (io) {
                 } catch (err) {
                     console.error("Error setting offline:", err);
                 }
+            }
+        });
+
+        socket.on(EVENTS.JOIN_ROOM, async ({ id: roomId }) => {
+            if (!roomId) return;
+
+            // enforce membership (optional but recommended)
+            const isMember = await RoomMember.exists({ room: roomId, user: userId });
+            if (!isMember) return; // or socket.emit("room:error", ...)
+
+            socket.join(ROOM_ROOM(roomId));
+
+            // optional: tell others someone joined
+            socket.to(ROOM_ROOM(roomId)).emit("room:presence", {
+                roomId,
+                userId,
+                type: "join",
+            });
+        });
+
+        socket.on(EVENTS.LEAVE_ROOM, async ({ id: roomId }) => {
+            if (!roomId) return;
+
+            socket.leave(ROOM_ROOM(roomId));
+
+            socket.to(ROOM_ROOM(roomId)).emit("room:presence", {
+                roomId,
+                userId,
+                type: "leave",
+            });
+        });
+
+        socket.on(EVENTS.ROOM_SEND, async ({ id: roomId, message }) => {
+            console.log(roomId, message);
+            if (!roomId || !message?.trim()) return;
+
+            // enforce membership
+            const isMember = await RoomMember.exists({ room: roomId, user: userId });
+            console.log(isMember);
+
+            if (!isMember) return;
+
+            // save message
+            let saved;
+            try {
+                saved = await RoomMessage.create({
+                    room: roomId,
+                    sender: userId,
+                    message: message.trim(),
+                });
+            } catch (err) {
+                console.error("Error saving room message:", err);
+                return;
+            }
+
+            const payload = {
+                _id: saved._id,
+                room: roomId,
+                sender: userId,
+                message: saved.message,
+                createdAt: saved.createdAt,
+            };
+
+            // emit to everyone else in room
+            socket.to(ROOM_ROOM(roomId)).emit(EVENTS.ROOM_RECEIVE, payload);
+
+            // optional: notify all room members (even if they aren’t inside the room page)
+            try {
+                const members = await RoomMember.find({ room: roomId }).select("user");
+                members.forEach((m) => {
+                    const memberId = String(m.user);
+                    if (memberId !== String(userId)) {
+                        io.to(USER_ROOM(memberId)).emit(EVENTS.ROOM_NOTIFICATION, {
+                            roomId,
+                            senderId: userId,
+                            message: saved.message,
+                        });
+                    }
+                });
+            } catch (e) {
+                console.error("ROOM_NOTIFICATION error:", e);
             }
         });
     });

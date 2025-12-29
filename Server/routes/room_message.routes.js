@@ -10,5 +10,6 @@ router.get('/:id', RoomMessageController.findOneMessage);
 router.post('/', RoomMessageController.createMessage);
 router.patch('/:id', RoomMessageController.updateMessage);
 router.delete('/:id', RoomMessageController.deleteMessage);
+router.get('/room/:roomId', RoomMessageController.findMessagesByRoom);
 
 module.exports = router;

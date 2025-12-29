@@ -24,16 +24,17 @@ module.exports.findRoom = async (req, res) => {
 module.exports.createRoom = async (req, res) => {
     try {
         const answer = await Room.create(req.body);
+        answer.memberCount += 1
+        answer.save()
         const populated = await Room.findById(answer._id).populate('owner');
         res.json(populated);
     } catch (error) {
         if (error.name === "ValidationError") {
             return res.status(400).json(error.errors);
         }
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({message: "Server error"});
     }
 };
-
 
 
 module.exports.updateRoom = async (req, res) => {
@@ -41,14 +42,14 @@ module.exports.updateRoom = async (req, res) => {
         const resp = await Room.findByIdAndUpdate(
             req.params.id,
             req.body,
-            { new: true, runValidators: true }
+            {new: true, runValidators: true}
         ).populate('owner');
         res.json(resp);
     } catch (error) {
         if (error.name === "ValidationError") {
             return res.status(400).json(error.errors);
         }
-        return res.status(500).json({ message: "Server error" });
+        return res.status(500).json({message: "Server error"});
     }
 };
 

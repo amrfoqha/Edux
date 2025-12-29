@@ -22,6 +22,17 @@ module.exports.findOneMessage = async (req, res) => {
     }
 };
 
+module.exports.findMessagesByRoom = async (req, res) => {
+    try {
+        const messages = await RoomMessage.find({ room: req.params.roomId })
+            .populate('sender')
+            .populate('room');
+        res.json(messages);
+    } catch (error) {
+        return res.status(400).send({ error: error.message });
+    }
+};
+
 module.exports.createMessage = async (req, res) => {
     try {
         const message = await RoomMessage.create(req.body);

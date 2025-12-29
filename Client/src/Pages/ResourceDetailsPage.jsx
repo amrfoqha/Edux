@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {getResource} from "../API/ResouceAPI";
-import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 
 const ResourceDetailsPage = () => {
@@ -22,7 +21,6 @@ const ResourceDetailsPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header />
 
             <main className="container mx-auto px-6 py-10 max-w-4xl">
 

@@ -1,18 +1,18 @@
-import { useState, useEffect } from "react";
+import {useEffect, useState} from "react";
 import ChatHeader from "../components/chat/ChatHeader";
 import ChatStats from "../components/chat/ChatStats";
 import ConversationList from "../components/chat/ConversationList";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import ChatSearch from "../Components/chat/ChatSearch.jsx";
-import { getAllUsers } from "../API/UserAPI";
-import { getUnreadCounts, getLastMessages } from "../API/ChatAPI";
-import { useAuth } from "../Hooks/useAuth";
+import {getAllUsers} from "../API/UserAPI";
+import {getLastMessages, getUnreadCounts} from "../API/ChatAPI";
+import {useAuth} from "../Hooks/useAuth";
 import {EVENTS} from "../socket/events.js";
 import socket from "../socket.js";
 
 export default function ChatPage() {
     const onNavigate = useNavigate();
-    const { user: currentUser } = useAuth();
+    const {user: currentUser} = useAuth();
     const [searchQuery, setSearchQuery] = useState("");
     const [conversations, setConversations] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -58,7 +58,7 @@ export default function ChatPage() {
     useEffect(() => {
         if (!socket || !currentUser) return;
 
-        const handleSnapshot = ({ onlineUserIds }) => {
+        const handleSnapshot = ({onlineUserIds}) => {
             const onlineSet = new Set((onlineUserIds || []).map(String));
 
             setConversations((prev) =>
@@ -69,10 +69,10 @@ export default function ChatPage() {
             );
         };
 
-        const handleStatusUpdate = ({ userId, isOnline }) => {
+        const handleStatusUpdate = ({userId, isOnline}) => {
             setConversations((prev) =>
                 prev.map((conv) =>
-                    String(conv.id) === String(userId) ? { ...conv, online: isOnline } : conv
+                    String(conv.id) === String(userId) ? {...conv, online: isOnline} : conv
                 )
             );
         };
@@ -85,7 +85,6 @@ export default function ChatPage() {
             socket.off(EVENTS.USER_STATUS, handleStatusUpdate);
         };
     }, [currentUser]);
-
 
 
     const handleNavigate = (type, id) => {
@@ -102,9 +101,10 @@ export default function ChatPage() {
     return (
         <div className="min-h-screen bg-linear-to-br from-background via-muted/30 to-background py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-                <ChatHeader onNavigate={onNavigate} />
+                <ChatHeader subText={"Connect with students and manage your conversations"} text={"Messages"}
+                            routeText={"Browse Rooms"} onNavigate={onNavigate} route={"/rooms"}/>
 
-                <ChatSearch value={searchQuery} onChange={setSearchQuery} />
+                <ChatSearch value={searchQuery} onChange={setSearchQuery}/>
 
                 <ChatStats
                     unreadCount={conversations.reduce((a, c) => a + (c.unread || 0), 0)}

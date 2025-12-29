@@ -12,7 +12,7 @@ export default function ChatStats({ unreadCount, onNavigate }) {
         >
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Card
-                    onClick={() => onNavigate("chat-rooms")}
+                    onClick={() => onNavigate("/rooms")}
                     className="border-0 shadow-xl cursor-pointer overflow-hidden"
                 >
                     <div className="h-2 bg-gradient-to-r from-primary to-info" />

@@ -18,7 +18,6 @@ export default function SearchBar({
         shadow-[0_20px_60px_rgba(99,102,241,0.18)]
         px-10
         py-8
-        max-w-7xl
         mx-auto 
         ${className}
         `}

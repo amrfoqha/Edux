@@ -48,7 +48,7 @@ const BrowesResourcePage = () => {
       } catch (error) {
         console.log(error);
       }
-    }, 1000);
+    }, 500);
   };
 
   return (
