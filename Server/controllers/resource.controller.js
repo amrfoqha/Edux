@@ -116,7 +116,6 @@ module.exports.updateResourceAverageRating = async (req, res) => {
       new: true,
       runValidators: true,
     }).populate("uploader");
-    console.log(resp);
     res.json(resp);
   } catch (error) {
     if (error.name === "ValidationError") {

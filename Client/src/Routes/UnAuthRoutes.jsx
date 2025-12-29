@@ -3,6 +3,7 @@ import LoginPage from "../Pages/LoginPage";
 import RegisterPage from "../Pages/RegisterPage";
 import HomePage from "../Pages/HomePage.jsx";
 import BrowesResourcePage from "../Pages/BrowesResourcePage";
+import ResourceDetailsPage from "../Pages/ResourceDetailsPage";
 export default function UnAuthRoutes() {
   return (
     <Routes>
@@ -11,6 +12,7 @@ export default function UnAuthRoutes() {
       <Route path="/" element={<HomePage />} />
       <Route path="/browse" element={<BrowesResourcePage />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="/resources/:id" element={<ResourceDetailsPage />} />
     </Routes>
   );
 }

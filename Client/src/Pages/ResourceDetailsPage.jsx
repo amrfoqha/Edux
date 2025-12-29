@@ -112,7 +112,7 @@ const ResourceDetailsPage = () => {
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const favorites = await getAllFavoritesByUserId(user._id);
+        const favorites = await getAllFavoritesByUserId(user?._id);
         const isFavorite = favorites.some(
           (favorite) => favorite.resource._id === id
         );
@@ -122,7 +122,7 @@ const ResourceDetailsPage = () => {
       }
     };
     fetchFavorites();
-  }, [user._id]);
+  }, [user?._id]);
 
   const addToFavorite = async (resourceId) => {
     if (isFavorite) {
@@ -131,7 +131,7 @@ const ResourceDetailsPage = () => {
       try {
         const data = {
           resourceId,
-          userId: user._id,
+          userId: user?._id,
         };
         await removeFromFavoriteResource(data);
       } catch (error) {
@@ -271,7 +271,7 @@ const ResourceDetailsPage = () => {
           </div>
         </div>
 
-        <div className="mb-16">
+        <div className="mb-16 mt-10">
           <Card className="border-0 shadow-lg">
             <CardHeader className="p-8 md:p-12">
               <CardTitle className="text-3xl">Reviews & Ratings</CardTitle>

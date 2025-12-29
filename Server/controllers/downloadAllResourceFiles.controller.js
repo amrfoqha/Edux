@@ -36,7 +36,7 @@ module.exports.downloadAllResourceFiles = async (req, res) => {
 
     // أضف الملفات للـ ZIP بعد التحقق
     let filesAdded = 0;
-
+    console.log(resource.files);
     resource.files.forEach((file, index) => {
       if (!file) {
         console.warn(`Skipping file at index ${index}: missing path`);
@@ -56,11 +56,10 @@ module.exports.downloadAllResourceFiles = async (req, res) => {
       archive.file(filePath, { name: path.basename(filePath) });
       filesAdded++;
     });
-
+    console.log(filesAdded);
     if (filesAdded === 0) {
       return res.status(404).json({ message: "No valid files to download" });
     }
-
     await archive.finalize();
 
     // إذا لم يتم إضافة أي ملف، ارجع خطأ
@@ -69,7 +68,6 @@ module.exports.downloadAllResourceFiles = async (req, res) => {
     }
 
     // إبدأ البث النهائي للـ ZIP
-    await archive.finalize();
   } catch (error) {
     console.error("Download all files error:", error);
     res
