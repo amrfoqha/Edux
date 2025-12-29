@@ -5,22 +5,20 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
 const generateAccessToken = (user) =>
-    jwt.sign(
-        { id: user._id, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-    );
+  jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
 const generateRefreshToken = async (userId) => {
-    const token = crypto.randomBytes(40).toString("hex");
+  const token = crypto.randomBytes(40).toString("hex");
 
-    await RefreshToken.create({
-        user: userId,
-        token,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    });
+  await RefreshToken.create({
+    user: userId,
+    token,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
 
-    return token;
+  return token;
 };
 
 exports.register = async (req, res) => {
@@ -52,68 +50,70 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) {
-        return res.status(400).json({ message: "Invalid email or password" });
-    }
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(400).json({ message: "Invalid email or password" });
+  }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        return res.status(400).json({ message: "Invalid email or password" });
-    }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return res.status(400).json({ message: "Invalid email or password" });
+  }
 
-    // Set user as online
-    user.isOnline = true;
-    await user.save();
+  // Set user as online
+  user.isOnline = true;
+  await user.save();
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = await generateRefreshToken(user._id);
-    res.json({
-        accessToken,
-        refreshToken,
-    });
+  const accessToken = generateAccessToken(user);
+  const refreshToken = await generateRefreshToken(user._id);
+  res.json({
+    accessToken,
+    refreshToken,
+  });
 };
 
 exports.refresh = async (req, res) => {
-    const { refreshToken } = req.body;
+  const { refreshToken } = req.body;
 
-    if (!refreshToken) {
-        return res.status(401).json({ message: "Missing refresh token" });
-    }
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Missing refresh token" });
+  }
 
-    const storedToken = await RefreshToken.findOne({ token: refreshToken });
+  const storedToken = await RefreshToken.findOne({ token: refreshToken });
 
-    if (!storedToken || storedToken.expiresAt < new Date()) {
-        return res.status(403).json({ message: "Invalid or expired refresh token" });
-    }
+  if (!storedToken || storedToken.expiresAt < new Date()) {
+    return res
+      .status(403)
+      .json({ message: "Invalid or expired refresh token" });
+  }
 
-    const accessToken = jwt.sign(
-        { id: storedToken.user },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-    );
+  const accessToken = jwt.sign(
+    { id: storedToken.user },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
 
-    res.json({ accessToken });
+  res.json({ accessToken });
 };
 
 exports.logout = async (req, res) => {
-    try {
-        const userId = req.user.id;
+  try {
+    const userId = req.user.id;
 
-        const io = req.app.get("io");
-        if (io?.forceLogoutUser) {
-            await io.forceLogoutUser(userId);
-        } else if (io) {
-            await User.findByIdAndUpdate(userId, { isOnline: false });
-            io.emit("user:status", { userId, isOnline: false });
-        } else {
-            await User.findByIdAndUpdate(userId, { isOnline: false });
-        }
-
-        res.json({ message: "Logged out successfully" });
-    } catch (error) {
-        res.status(500).json({ message: "Logout failed" });
+    const io = req.app.get("io");
+    if (io?.forceLogoutUser) {
+      await io.forceLogoutUser(userId);
+    } else if (io) {
+      await User.findByIdAndUpdate(userId, { isOnline: false });
+      io.emit("user:status", { userId, isOnline: false });
+    } else {
+      await User.findByIdAndUpdate(userId, { isOnline: false });
     }
+
+    res.json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Logout failed" });
+  }
 };

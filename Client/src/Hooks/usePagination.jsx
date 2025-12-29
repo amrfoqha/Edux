@@ -7,7 +7,6 @@ const UsePagination = ({
   limit,
   totalPages,
 }) => {
-  console.log(totalPages + " " + totalItems + " " + limit);
   return (
     <Pagination
       count={totalPages}
@@ -24,6 +23,7 @@ const UsePagination = ({
           borderRadius: "12px",
           fontSize: "20px",
           margin: "0 8px",
+          marginBottom: "25px",
         },
         "& .Mui-selected": {
           background:

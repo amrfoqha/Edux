@@ -1,15 +1,14 @@
-import {Navigate, Route, Routes} from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "../Pages/HomePage";
 import ChatPage from "../Pages/ChatPage";
 import UserProfile from "../Pages/UserProfile";
 import DirectMessagePage from "../Pages/DirectMessagePage.jsx";
 import GroupChatPage from "../Pages/GroupChatPage.jsx";
-import {useAuth} from "../Hooks/useAuth.jsx";
+import { useAuth } from "../Hooks/useAuth.jsx";
 import BrowesResourcePage from "../Pages/BrowesResourcePage";
 import ResourceDetailsPage from "../Pages/ResourceDetailsPage";
 import RoomsPage from "@/Pages/RoomsPage.jsx";
 import {CreateRoomPage} from "@/Pages/CreateRoomPage.jsx";
-
 
 export default function AuthRoutes() {
     const {user} = useAuth();

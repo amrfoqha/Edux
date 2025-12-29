@@ -1,6 +1,5 @@
 import api from "./baseUrl.jsx";
 
-
 export const uploadResource = async (data) => {
   try {
     const response = await api.post("/uploads", data);
@@ -78,6 +77,41 @@ export const getResourcesByPage = async (page, limit, params) => {
     return response.data;
   } catch (error) {
     console.error("Error getting resources by page:", error);
+    throw error;
+  }
+};
+
+export const downloadAll = async (resourceId, resourceTitle) => {
+  try {
+    const res = await api.get(`/resources/download-all/${resourceId}`, {
+      responseType: "blob",
+    });
+
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = `${resourceTitle || "resource"}.zip`;
+
+    document.body.appendChild(a);
+    a.click();
+
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const updateResourceAverageRating = async (id, avgRating) => {
+  try {
+    const response = await api.put(`/resources/${id}/average-rating`, {
+      average_rating: avgRating,
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating resource average rating:", error);
     throw error;
   }
 };

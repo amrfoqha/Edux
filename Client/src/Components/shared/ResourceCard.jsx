@@ -50,7 +50,7 @@ export function ResourceCard({ resource, onClick, showDetails = true }) {
       className="h-full"
     >
       <Card
-        className="cursor-pointer h-auto  flex flex-col overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl border border-border/50"
+        className="cursor-pointer h-auto w-full flex flex-col overflow-hidden bg-white shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl border border-border/50"
         onClick={() => onClick?.(resource.id)}
       >
         <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
@@ -104,7 +104,7 @@ export function ResourceCard({ resource, onClick, showDetails = true }) {
           <div className="flex items-center gap-1.5">
             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
             <span className="font-semibold text-sm">
-              {Number(resource.rating).toFixed(1)}
+              {Number(resource.average_rating).toFixed(1)}
             </span>
           </div>
 
