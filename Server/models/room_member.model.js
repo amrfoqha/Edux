@@ -21,4 +21,7 @@ const roomMemberSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+roomMemberSchema.index({ room: 1, user: 1 }, { unique: true });
+
 module.exports = RoomMember = mongoose.model("RoomMember", roomMemberSchema);

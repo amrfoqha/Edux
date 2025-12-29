@@ -14,7 +14,7 @@ export default function Logo({ onClick }) {
             </div>
             <div>
         <span className="font-bold text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-          CampusShare
+          Edux
         </span>
                 <p className="text-xs text-muted-foreground -mt-1">Learn Together</p>
             </div>

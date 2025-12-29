@@ -22,39 +22,31 @@ const generateRefreshToken = async (userId) => {
 };
 
 exports.register = async (req, res) => {
-  const {
-    name,
-    email,
-    password,
-    university,
-    faculty,
-    department,
-    confirmPassword,
-  } = req.body;
+    const { name, email, password, university, faculty, department, confirmPassword } = req.body;
 
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    return res.status(400).json({ message: "User already exists" });
-  }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+    }
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-    confirmPassword,
-    university,
-    faculty,
-    department,
-    isOnline: true,
-  });
+    const user = await User.create({
+        name,
+        email,
+        password,
+        confirmPassword,
+        university,
+        faculty,
+        department,
+        isOnline: true,
+    });
 
-  const accessToken = generateAccessToken(user);
-  const refreshToken = await generateRefreshToken(user._id);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = await generateRefreshToken(user._id);
 
-  res.status(201).json({
-    accessToken,
-    refreshToken,
-  });
+    res.status(201).json({
+        accessToken,
+        refreshToken,
+    });
 };
 
 exports.login = async (req, res) => {

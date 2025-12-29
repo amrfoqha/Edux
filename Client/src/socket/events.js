@@ -7,4 +7,10 @@ export const EVENTS = Object.freeze({
     DM_RECEIVE: "dm:receive",
     JOIN_DM: "join:dm",
     LEAVE_DM: "leave:dm",
+
+    JOIN_ROOM: "room:join",
+    LEAVE_ROOM: "room:leave",
+    ROOM_SEND: "room:send",
+    ROOM_RECEIVE: "room:receive",
+    ROOM_NOTIFICATION: "room:notification",
 });

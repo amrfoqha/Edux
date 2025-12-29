@@ -16,21 +16,21 @@ export default function GroupChatHeader({room, members, onBack, onToggleMembers}
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={() => onclick(onBack)}
+                                onClick={onBack}
                                 className="rounded-full"
                             >
                                 <ArrowLeft className="h-5 w-5"/>
                             </Button>
                         </motion.div>
                         <div
-                            className={`w-12 h-12 bg-gradient-to-br ${room.color} rounded-xl flex items-center justify-center`}>
+                            className={`w-12 h-12 bg-gradient-to-br ${room?.color} rounded-xl flex items-center justify-center`}>
                             <Hash className="text-white"/>
                         </div>
 
                         <div>
-                            <h2 className="font-bold text-lg">{room.name}</h2>
+                            <h2 className="font-bold text-lg">{room?.name}</h2>
                             <p className="text-sm text-muted-foreground">
-                                {members.filter(m => m.online).length} / {members.length} online
+                                1 / {members} online
                             </p>
                         </div>
                     </div>
