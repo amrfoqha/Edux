@@ -104,7 +104,7 @@ export function ResourceCard({ resource, onClick, showDetails = true }) {
           <div className="flex items-center gap-1.5">
             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
             <span className="font-semibold text-sm">
-              {Number(resource.rating).toFixed(1)}
+              {Number(resource.average_rating).toFixed(1)}
             </span>
           </div>
 

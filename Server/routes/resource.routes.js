@@ -11,5 +11,8 @@ router.get("/:id", ResourceController.findResource);
 router.post("/", ResourceController.createResource);
 router.patch("/:id", ResourceController.updateResource);
 router.delete("/:id", ResourceController.deleteResource);
-
+router.put(
+  "/:id/average-rating",
+  ResourceController.updateResourceAverageRating
+);
 module.exports = router;

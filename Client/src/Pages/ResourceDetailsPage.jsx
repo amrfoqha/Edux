@@ -1,6 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getResource, downloadAll } from "../API/ResouceAPI";
+import {
+  getResource,
+  downloadAll,
+  updateResourceAverageRating,
+} from "../API/ResouceAPI";
 import Footer from "../Components/Footer";
 import { Button } from "../Components/ui/button";
 import { ArrowLeft, Download, Flag, Heart, Share2, Star } from "lucide-react";
@@ -11,7 +15,9 @@ import { addToFavoriteResource } from "../API/FavoriteResourceAPI";
 import { useAuth } from "../Hooks/useAuth";
 import { getAllFavoritesByUserId } from "../API/FavoriteResourceAPI";
 import { removeFromFavoriteResource } from "../API/FavoriteResourceAPI";
+import { addReview, getReviewsByResourceId } from "../API/ReviewAPI";
 import { Link } from "react-router-dom";
+import { Progress } from "../components/ui/Progress";
 
 import {
   Card,
@@ -19,6 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import { Textarea } from "../Components/ui/TextArea";
 
 const ResourceDetailsPage = () => {
   const navigate = useNavigate();
@@ -29,6 +36,78 @@ const ResourceDetailsPage = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [reviews, setReviews] = useState([]);
+  const [avgRating, setAvgRating] = useState(0);
+  const [ratingDistribution, setRatingDistribution] = useState([
+    { stars: 1, count: 0, percentage: 0 },
+    { stars: 2, count: 0, percentage: 0 },
+    { stars: 3, count: 0, percentage: 0 },
+    { stars: 4, count: 0, percentage: 0 },
+    { stars: 5, count: 0, percentage: 0 },
+  ]);
+
+  const calculateRatingAvg = (reviews) => {
+    const totalReviews = reviews.length;
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    setAvgRating(
+      totalReviews ? Number(totalRating / totalReviews).toFixed(1) : 0
+    );
+  };
+
+  const handleSubmitReview = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    const reviewData = {
+      user: user._id,
+      resource: id,
+      rating,
+      comment,
+    };
+
+    try {
+      const result = await addReview(reviewData);
+      setReviews([...reviews, result]);
+      calculateRatingDistribution(reviews);
+      await updateResourceAverageRating(id, avgRating);
+    } catch (error) {
+      console.error("Error adding review:", error);
+      throw error;
+    }
+  };
+
+  const calculateRatingDistribution = (reviews) => {
+    const totalReviews = reviews?.length || 0;
+
+    const distribution = [1, 2, 3, 4, 5].map((star) => {
+      const count = reviews.filter((r) => r.rating === star).length;
+      return {
+        stars: star,
+        count,
+        percentage: totalReviews ? (count / totalReviews) * 100 : 0,
+      };
+    });
+
+    setRatingDistribution(distribution);
+  };
+
+  useEffect(() => {
+    calculateRatingDistribution(reviews);
+    calculateRatingAvg(reviews);
+  }, [reviews]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const data = await getReviewsByResourceId(id);
+        setReviews(data);
+        calculateRatingDistribution(reviews);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+    fetchReviews();
+  }, [id]);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -113,7 +192,7 @@ const ResourceDetailsPage = () => {
             {resource.createdAt.toString().split("T")[0]}
           </p>
           <div className="flex items-center gap-3 text-sm text-gray-600">
-            ⭐ {resource.rating || "4.9"} ({resource.reviewsCount || 0} reviews)
+            ⭐ {avgRating} ({reviews.length} reviews)
             <span>•</span>
             📥 {resource.downloads || 0} downloads
           </div>
@@ -201,15 +280,13 @@ const ResourceDetailsPage = () => {
               {/* Rating Overview */}
               <div className="space-y-8">
                 <div className="text-center py-8">
-                  <div className="text-6xl font-bold mb-4">
-                    {resource.average_rating.toFixed(1)}
-                  </div>
+                  <div className="text-6xl font-bold mb-4">{avgRating}</div>
                   <div className="flex items-center justify-center gap-2 mb-3">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
                         className={`h-6 w-6 ${
-                          star <= resource.average_rating
+                          star <= avgRating
                             ? "fill-accent text-accent"
                             : "text-muted"
                         }`}
@@ -287,18 +364,20 @@ const ResourceDetailsPage = () => {
               <div className="border-t pt-12 space-y-8">
                 <h4 className="text-2xl font-semibold mb-8">Student Reviews</h4>
                 {reviews.map((review) => (
-                  <div key={review.id} className="pb-8 border-b last:border-0">
+                  <div key={review._id} className="pb-8 border-b last:border-0">
                     <div className="flex items-start gap-4">
                       <Avatar className="h-12 w-12">
                         <AvatarFallback>
-                          {review.user.charAt(0).toUpperCase()}
+                          {review.user.name.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-grow space-y-3">
                         <div className="flex items-center justify-between">
-                          <p className="font-semibold text-lg">{review.user}</p>
+                          <p className="font-semibold text-lg">
+                            {review.user.name}
+                          </p>
                           <p className="text-sm text-muted-foreground">
-                            {review.date}
+                            {review.createdAt.toString().split("T")[0]}
                           </p>
                         </div>
                         <div className="flex gap-1">

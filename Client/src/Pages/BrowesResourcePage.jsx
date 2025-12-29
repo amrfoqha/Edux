@@ -4,7 +4,7 @@ import { Filter, Search } from "lucide-react";
 import FilterSelect from "../Components/shared/FilterSelect";
 import SearchInput from "../Components/shared/SearchInput";
 import SearchBar from "../Components/shared/SearchBar";
-import { getResourcesByPage } from "../API/ResouceAPI";
+import { getResources, getResourcesByPage } from "../API/ResouceAPI";
 import {
   universities,
   faculties,
@@ -19,7 +19,7 @@ const BrowesResourcePage = () => {
   const [university, setUniversity] = useState("");
   const [faculty, setFaculty] = useState("");
   const [department, setDepartment] = useState("");
-  const [type, setType] = useState("book");
+  const [type, setType] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(9);
@@ -41,9 +41,12 @@ const BrowesResourcePage = () => {
         department,
         type,
       });
+
       setAllResources(resources.data);
       setTotalItems(resources.totalItems);
       setTotalPages(resources.totalPages);
+      console.log(resources);
+      console.log(totalItems, totalPages);
     } catch (error) {
       console.log(error);
     }

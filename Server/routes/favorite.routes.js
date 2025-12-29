@@ -7,6 +7,10 @@ router.use(authMiddleware);
 
 router.get("/", FavoriteController.findAllFavorites);
 router.get("/user/:userId", FavoriteController.findFavoritesByUserId);
+router.get(
+  "/resource/:resourceId",
+  FavoriteController.findFavoriteByResourceId
+);
 router.get("/:id", FavoriteController.findFavorite);
 router.post("/", FavoriteController.createFavorite);
 router.patch("/:id", FavoriteController.updateFavorite);
