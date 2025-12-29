@@ -102,3 +102,16 @@ export const downloadAll = async (resourceId, resourceTitle) => {
     console.error(err);
   }
 };
+
+export const updateResourceAverageRating = async (id, avgRating) => {
+  try {
+    const response = await api.put(`/resources/${id}/average-rating`, {
+      average_rating: avgRating,
+    });
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating resource average rating:", error);
+    throw error;
+  }
+};
