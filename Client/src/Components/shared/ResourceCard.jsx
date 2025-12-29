@@ -10,7 +10,7 @@ import {
 import { Card, CardContent, CardFooter } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { motion } from "motion/react";
-import pdfThumbnail from "../../../public/images/pdf-placeholder.png";
+import pdfThumbnail from "../../assets/images/pdf-placeholder.png";
 
 const typeColors = {
   "Lecture Slides": "from-blue-400 to-blue-600",

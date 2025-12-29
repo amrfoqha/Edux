@@ -1,5 +1,6 @@
 import api from "./baseUrl.jsx";
 
+
 export const uploadResource = async (data) => {
   try {
     const response = await api.post("/uploads", data);
