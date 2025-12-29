@@ -13,6 +13,8 @@ export default function UnAuthRoutes() {
       <Route path="/browse" element={<BrowesResourcePage />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
       <Route path="/resources/:id" element={<ResourceDetailsPage />} />
+      <Route path="/about" element={<AboutUs />} />
+
     </Routes>
   );
 }
