@@ -1,118 +1,334 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {getResource} from "../API/ResouceAPI";
-import Header from "../Components/Header";
+import { getResource, downloadAll } from "../API/ResouceAPI";
 import Footer from "../Components/Footer";
+import { Button } from "../Components/ui/button";
+import { ArrowLeft, Download, Flag, Heart, Share2, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Badge } from "../components/ui/badge";
+import { Avatar, AvatarFallback } from "../components/ui/avatar";
+import { addToFavoriteResource } from "../API/FavoriteResourceAPI";
+import { useAuth } from "../Hooks/useAuth";
+import { getAllFavoritesByUserId } from "../API/FavoriteResourceAPI";
+import { removeFromFavoriteResource } from "../API/FavoriteResourceAPI";
+import { Link } from "react-router-dom";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 const ResourceDetailsPage = () => {
-    const { id } = useParams();
-    const [resource, setResource] = useState(null);
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [resource, setResource] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const { user } = useAuth();
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [reviews, setReviews] = useState([]);
 
-    useEffect(() => {
-        const fetchResource = async () => {
-            const data = await getResource(id);
-            setResource(data);
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      try {
+        const favorites = await getAllFavoritesByUserId(user._id);
+        const isFavorite = favorites.some(
+          (favorite) => favorite.resource._id === id
+        );
+        setIsFavorite(isFavorite);
+      } catch (error) {
+        console.error("Error fetching favorites:", error);
+      }
+    };
+    fetchFavorites();
+  }, [user._id]);
+
+  const addToFavorite = async (resourceId) => {
+    if (isFavorite) {
+      console.log(resourceId);
+      setIsFavorite(false);
+      try {
+        const data = {
+          resourceId,
+          userId: user._id,
         };
-        fetchResource();
-    }, [id]);
-
-    if (!resource) {
-        return <p className="text-center mt-20">Loading...</p>;
+        await removeFromFavoriteResource(data);
+      } catch (error) {
+        console.error("Error removing from favorites:", error);
+      }
+      return;
     }
+    try {
+      await addToFavoriteResource(resourceId, user._id);
+      console.log("Favorite added successfully");
+      setIsFavorite(true);
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+    }
+  };
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <Header />
+  useEffect(() => {
+    const fetchResource = async () => {
+      try {
+        const data = await getResource(id);
+        setResource(data);
+      } catch (error) {
+        console.error("Error fetching resource:", error);
+      }
+    };
+    fetchResource();
+  }, [id]);
 
-            <main className="container mx-auto px-6 py-10 max-w-4xl">
+  if (!resource) {
+    return <p className="text-center mt-20">Loading...</p>;
+  }
 
-                <div className="bg-white rounded-3xl shadow p-8">
-                    <span className="inline-block mb-3 px-3 py-1 text-xs bg-purple-100 text-purple-600 rounded-full">
-                        {resource.type}
-                    </span>
+  return (
+    <div className=" min-h-screen bg-gray-50">
+      <div className="container mx-auto flex items-center justify-start">
+        <Button
+          variant="ghost"
+          size="lg"
+          onClick={() => navigate("/browse")}
+          className="ml-38 w-48 hover:bg-primary/20 mt-5"
+        >
+          <ArrowLeft className="h-5 w-5" />
+          Back to Browse
+        </Button>
+      </div>
+      <main className="container mx-auto px-6 py-10 max-w-4xl">
+        <div className="bg-white rounded-3xl shadow p-8">
+          <span className="inline-block mb-3 px-3 py-1 text-xs bg-purple-100 text-purple-600 rounded-full">
+            {resource.type}
+          </span>
 
-                    <h1 className="text-3xl font-bold mb-2">{resource.title}</h1>
+          <h1 className="text-3xl font-bold mb-2">{resource.title}</h1>
 
-                    <p className="text-gray-500 mb-4">
-                        {resource.university} • {resource.department}
-                    </p>
+          <p className="text-gray-500 mb-4">
+            {resource.university} • {resource.faculty} • {resource.department}
+          </p>
+          <p className="text-gray-500 mb-4">
+            {resource.createdAt.toString().split("T")[0]}
+          </p>
+          <div className="flex items-center gap-3 text-sm text-gray-600">
+            ⭐ {resource.rating || "4.9"} ({resource.reviewsCount || 0} reviews)
+            <span>•</span>
+            📥 {resource.downloads || 0} downloads
+          </div>
+          <div className="space-y-4 border-t-2 pt-4 mt-4">
+            <h3 className="text-2xl font-semibold">Description</h3>
+            <p className="text-muted-foreground text-lg leading-relaxed max-w-3xl">
+              {resource.description}
+            </p>
+          </div>
 
-                    <div className="flex items-center gap-3 text-sm text-gray-600">
-                        ⭐ {resource.rating || "4.9"} ({resource.reviewsCount || 0} reviews)
-                        <span>•</span>
-                        📥 {resource.downloads || 0} downloads
-                    </div>
+          <div className="space-y-4 mt-8">
+            <h3 className="text-2xl font-semibold">Tags</h3>
+            <div className="flex flex-wrap gap-3">
+              {resource.tags.map((tag, index) => (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="text-sm px-4 py-2"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </div>
 
-                    <div className="flex gap-3 mt-6">
-                        <button className="bg-purple-600 text-white px-6 py-2 rounded-xl hover:bg-purple-700">
-                            Download Resource
-                        </button>
-                        <button className="border px-6 py-2 rounded-xl">Save</button>
-                        <button className="border px-6 py-2 rounded-xl">Share</button>
-                    </div>
+          <div className="flex items-center gap-4 mt-4 p-6 bg-muted/50 rounded-xl">
+            <Avatar className="h-14 w-14">
+              <AvatarFallback className="bg-primary text-white text-xl">
+                {resource.uploader.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-semibold text-lg">
+                Uploaded by {resource.uploader.name}
+              </p>
+              <p className="text-muted-foreground">Verified Contributor</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-4 pt-4">
+            <Button
+              size="lg"
+              className="px-8 py-6 text-base"
+              onClick={() => downloadAll(resource._id, resource.title)}
+            >
+              <Download className="h-5 w-5 mr-2" />
+              Download Resource
+            </Button>
+            {/* 
+            <Link
+              to={`http://localhost:8000/api/resources/${resource._id}/download-all`}
+              target="_blank"
+              className="px-8 py-6 text-base"
+            >
+              <Download className="h-5 w-5 mr-2" />
+              Download Resource{" "}
+            </Link> */}
+
+            <Button
+              size="lg"
+              variant={isFavorite ? "secondary" : "outline"}
+              onClick={() => {
+                addToFavorite(resource._id);
+              }}
+              className="px-8 py-6 text-base"
+            >
+              <Heart
+                className={`h-5 w-5 mr-2 ${isFavorite ? "fill-current" : ""}`}
+              />
+              {isFavorite ? "Saved" : "Save"}
+            </Button>
+            <Button size="lg" variant="outline" className="px-8 py-6 text-base">
+              <Share2 className="h-5 w-5 mr-2" />
+              Share
+            </Button>
+          </div>
+        </div>
+
+        <div className="mb-16">
+          <Card className="border-0 shadow-lg">
+            <CardHeader className="p-8 md:p-12">
+              <CardTitle className="text-3xl">Reviews & Ratings</CardTitle>
+            </CardHeader>
+            <CardContent className="p-8 md:p-12 space-y-12">
+              {/* Rating Overview */}
+              <div className="space-y-8">
+                <div className="text-center py-8">
+                  <div className="text-6xl font-bold mb-4">
+                    {resource.average_rating.toFixed(1)}
+                  </div>
+                  <div className="flex items-center justify-center gap-2 mb-3">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`h-6 w-6 ${
+                          star <= resource.average_rating
+                            ? "fill-accent text-accent"
+                            : "text-muted"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground text-lg">
+                    {reviews.length} reviews
+                  </p>
                 </div>
 
-                <section className="bg-white rounded-3xl shadow p-8 mt-8">
-                    <h2 className="text-xl font-bold mb-3">Description</h2>
-                    <p className="text-gray-600 leading-relaxed">
-                        {resource.description || "No description provided."}
-                    </p>
-
-                    <div className="flex gap-2 mt-4 flex-wrap">
-                        {resource.tags?.map((tag, i) => (
-                            <span
-                                key={i}
-                                className="px-3 py-1 text-xs bg-gray-100 rounded-full"
-                            >
-                                #{tag}
-                            </span>
-                        ))}
+                <div className="max-w-md mx-auto space-y-4">
+                  {ratingDistribution.map(({ stars, count, percentage }) => (
+                    <div key={stars} className="flex items-center gap-4">
+                      <div className="flex items-center gap-2 w-16">
+                        <span className="font-medium">{stars}</span>
+                        <Star className="h-4 w-4 fill-accent text-accent" />
+                      </div>
+                      <Progress value={percentage} className="flex-grow" />
+                      <span className="text-muted-foreground w-12 text-right">
+                        {count}
+                      </span>
                     </div>
-                </section>
+                  ))}
+                </div>
+              </div>
 
-                <section className="bg-white rounded-3xl shadow p-8 mt-8">
-                    <h2 className="text-xl font-bold mb-6">Reviews & Ratings</h2>
+              {/* Add Review */}
+              <div className="border-t pt-12 space-y-8">
+                <h4 className="text-2xl font-semibold">Write a Review</h4>
 
-                    <div className="text-center">
-                        <p className="text-4xl font-bold text-purple-600">4.9</p>
-                        <p className="text-sm text-gray-500">Based on student reviews</p>
-                    </div>
+                <div className="space-y-3">
+                  <label className="text-muted-foreground">Your Rating</label>
+                  <div className="flex gap-3">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setRating(star)}
+                        className="transition-transform hover:scale-110"
+                      >
+                        <Star
+                          className={`h-8 w-8 ${
+                            star <= rating
+                              ? "fill-accent text-accent"
+                              : "text-muted"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-                    <div className="mt-6 text-center text-gray-400">
-                        Reviews system coming soon 🚀
-                    </div>
-                </section>
+                <div className="space-y-3">
+                  <label className="text-muted-foreground">Your Review</label>
+                  <Textarea
+                    placeholder="Share your thoughts about this resource..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    rows={5}
+                    className="text-base"
+                  />
+                </div>
 
-                <section className="bg-white rounded-3xl shadow p-8 mt-8">
-                    <h2 className="text-xl font-bold mb-4">Related Resources</h2>
-                    <p className="text-gray-500 text-sm">
-                        Suggested resources based on this content
-                    </p>
+                <Button
+                  onClick={handleSubmitReview}
+                  disabled={rating === 0}
+                  size="lg"
+                  className="px-8"
+                >
+                  Submit Review
+                </Button>
+              </div>
 
-                    <div className="mt-4 space-y-3">
-                        <div className="border rounded-xl p-4">
-                            Introduction to Algorithms – Lecture Notes
+              {/* Review List */}
+              <div className="border-t pt-12 space-y-8">
+                <h4 className="text-2xl font-semibold mb-8">Student Reviews</h4>
+                {reviews.map((review) => (
+                  <div key={review.id} className="pb-8 border-b last:border-0">
+                    <div className="flex items-start gap-4">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback>
+                          {review.user.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-grow space-y-3">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold text-lg">{review.user}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {review.date}
+                          </p>
                         </div>
-                        <div className="border rounded-xl p-4">
-                            Data Structures – Exam Papers
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`h-5 w-5 ${
+                                star <= review.rating
+                                  ? "fill-accent text-accent"
+                                  : "text-muted"
+                              }`}
+                            />
+                          ))}
                         </div>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {review.comment}
+                        </p>
+                      </div>
                     </div>
-                </section>
-
-                <section className="bg-white rounded-3xl shadow p-8 mt-8 mb-20">
-                    <h2 className="text-xl font-bold mb-4">Need Help?</h2>
-                    <button className="border px-4 py-2 rounded-xl mr-3">
-                        Message uploader
-                    </button>
-                    <button className="border px-4 py-2 rounded-xl">
-                        Report issue
-                    </button>
-                </section>
-            </main>
-
-            <Footer />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
-    );
+      </main>
+
+      <Footer />
+    </div>
+  );
 };
 
 export default ResourceDetailsPage;

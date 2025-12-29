@@ -4,6 +4,7 @@ import { useAuth } from "../Hooks/useAuth";
 import { ResourceCard } from "../Components/shared/ResourceCard";
 import UsePagination from "../Hooks/usePagination";
 import { getUserResourcesPage } from "../API/UserAPI";
+import { useNavigate } from "react-router-dom";
 
 export const UploadForm = ({ refresh, setRefresh }) => {
   const [open, setOpen] = useState(false);
@@ -14,13 +15,13 @@ export const UploadForm = ({ refresh, setRefresh }) => {
   const [totalItems, setTotalItems] = useState(user.resources.length);
   const [limit, setLimit] = useState(9);
   const [totalPages, setTotalPages] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setRefresh(flag);
     const fetchData = async () => {
       try {
         const res = await getUserResourcesPage(user._id, currentPage, limit);
-        console.log(res);
         setAllResources(res.data);
         setTotalItems(res.totalItems);
         setTotalPages(res.totalPages);
@@ -92,7 +93,7 @@ export const UploadForm = ({ refresh, setRefresh }) => {
                 <ResourceCard
                   key={resource._id}
                   resource={resource}
-                  onClick={(e) => console.log(resource)}
+                  onClick={() => navigate(`/resources/${resource._id}`)}
                 />
               );
             })}

@@ -17,7 +17,7 @@ const resourceSchema = new mongoose.Schema(
       enum: ["downloadable", "requestable"],
       default: "downloadable",
     },
-    file_url: String,
+    files: [String],
     thumbnail: String,
     uploader: {
       type: mongoose.Schema.Types.ObjectId,

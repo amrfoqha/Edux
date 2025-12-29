@@ -28,13 +28,13 @@ app.use("/api/reviews", require("./routes/review.routes"));
 app.use("/api/resource-requests", require("./routes/resource_request.routes"));
 require("./routes/auth.routes")(app);
 app.use("/api/uploads", require("./routes/upload.routes"));
-
+app.use("/api/resources", require("./routes/downloadAllResourceFiles.routes"));
 const server = http.createServer(app);
 const io = new Server(server, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-    },
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
 });
 
 app.set("io", io);

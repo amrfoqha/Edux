@@ -6,17 +6,23 @@ import ChatForm from "../Components/ChatForm";
 import AiPicksForm from "../Components/AiPicksForm";
 import { useAuth } from "../Hooks/useAuth";
 import { getCurrentUser } from "../API/UserAPI";
+import { getAllFavoritesByUserId } from "../API/FavoriteResourceAPI";
 
 const UserProfile = () => {
   const [activeTab, setActiveTab] = useState("uploads");
   const [user, setUser] = useState(null);
   const [refresh, setRefresh] = useState(false);
+  const { user: authUser } = useAuth();
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const user = await getCurrentUser();
+        const favorites = await getAllFavoritesByUserId(authUser._id);
         setUser(user);
+        setFavorites(favorites);
+        console.log(favorites);
       } catch (error) {
         console.error("Error fetching user:", error);
       }
@@ -89,7 +95,11 @@ const UserProfile = () => {
                   value={user?.resources?.length}
                   highlight
                 />
-                <StatCard label="Favorites" value="0" highlight />
+                <StatCard
+                  label="Favorites"
+                  value={favorites?.length}
+                  highlight
+                />
                 <StatCard label="Downloads" value="128" highlight />
               </div>
             </div>

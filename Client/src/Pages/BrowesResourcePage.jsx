@@ -12,12 +12,13 @@ import {
 } from "../store/UniversitySection";
 import { ResourceCard } from "../components/shared/ResourceCard";
 import UsePagination from "../Hooks/usePagination";
+import { useNavigate } from "react-router-dom";
 
 const BrowesResourcePage = () => {
   const [search, setSearch] = useState("");
-  const [university, setUniversity] = useState(universities[0]);
-  const [faculty, setFaculty] = useState(faculties[0]);
-  const [department, setDepartment] = useState(departments[faculty][0]);
+  const [university, setUniversity] = useState("");
+  const [faculty, setFaculty] = useState("");
+  const [department, setDepartment] = useState("");
   const [type, setType] = useState("book");
   const [filterOpen, setFilterOpen] = useState(false);
   const [page, setPage] = useState(1);
@@ -25,30 +26,27 @@ const BrowesResourcePage = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [allResources, setAllResources] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setDepartment(departments[faculty][0]);
     submitSearch();
-  }, [faculty, page]);
+  }, [search, university, faculty, department, type, page]);
 
-  const submitSearch = () => {
-    setTimeout(async () => {
-      try {
-        const resources = await getResourcesByPage(page, limit, {
-          q: search,
-          university,
-          faculty,
-          department,
-          type,
-        });
-        setAllResources(resources.data);
-        setTotalItems(resources.totalItems);
-        setTotalPages(resources.totalPages);
-        console.log(resources);
-      } catch (error) {
-        console.log(error);
-      }
-    }, 1000);
+  const submitSearch = async () => {
+    try {
+      const resources = await getResourcesByPage(page, limit, {
+        q: search,
+        university,
+        faculty,
+        department,
+        type,
+      });
+      setAllResources(resources.data);
+      setTotalItems(resources.totalItems);
+      setTotalPages(resources.totalPages);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -72,12 +70,13 @@ const BrowesResourcePage = () => {
         </div>
       </motion.div>
 
-      <form action="#" onChange={submitSearch}>
+      <div>
         <SearchBar broweserFlag={true}>
-          <div className="flex flex-col w-full">
-            <div className="w-full flex gap-4 justify-between items-center">
+          <div className="flex flex-col container">
+            <div className="container flex gap-4 justify-between items-center">
               <SearchInput onChange={setSearch} className="w-[85%]" />
               <button
+                type="button"
                 onClick={() => setFilterOpen(!filterOpen)}
                 className={`flex py-2 items-center text-2xl border border-primary  px-4 rounded-2xl cursor-pointer hover:bg-accent ${
                   filterOpen && "bg-primary text-white"
@@ -93,7 +92,7 @@ const BrowesResourcePage = () => {
               <div className="flex justify-evenly mt-6  ">
                 <FilterSelect
                   placeholder="Resource Type"
-                  value={type}
+                  defaultValue={type}
                   onChange={setType}
                   className="w-full lg:w-32 text-xl"
                   options={[
@@ -104,7 +103,7 @@ const BrowesResourcePage = () => {
                 />
                 <FilterSelect
                   placeholder="University"
-                  value={university}
+                  defaultValue={university || universities[0]}
                   onChange={setUniversity}
                   className="w-full lg:w-86 text-xl"
                   options={universities.map((university) => ({
@@ -116,7 +115,7 @@ const BrowesResourcePage = () => {
                 <FilterSelect
                   placeholder="Faculty"
                   onChange={setFaculty}
-                  defaultValue={faculty}
+                  defaultValue={faculty || faculties[0]}
                   className="w-full lg:w-52 text-xl"
                   options={faculties.map((faculty) => ({
                     value: faculty,
@@ -126,20 +125,21 @@ const BrowesResourcePage = () => {
                 <FilterSelect
                   placeholder="Department"
                   onChange={setDepartment}
-                  value={department}
+                  defaultValue={department || ""}
                   className="w-full lg:w-62 text-xl"
-                  options={departments[faculty].map((department) => ({
+                  options={departments[faculty]?.map((department) => ({
                     value: department,
                     label: department,
                   }))}
                 />
               </div>
               <button
+                type="button"
                 onClick={() => {
                   setSearch("");
                   setUniversity(universities[0]);
                   setFaculty(faculties[0]);
-                  setDepartment(departments[faculty][0]);
+                  setDepartment(departments[faculties[0]][0]);
                   setType("book");
                   setFilterOpen(false);
                 }}
@@ -150,14 +150,14 @@ const BrowesResourcePage = () => {
             </div>
           </div>
         </SearchBar>
-      </form>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
         {allResources?.map((resource) => {
           return (
             <ResourceCard
               key={resource._id}
               resource={resource}
-              onClick={() => console.log(resource)}
+              onClick={() => navigate(`/resources/${resource._id}`)}
             />
           );
         })}
