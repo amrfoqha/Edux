@@ -92,7 +92,7 @@ export const UploadForm = ({ refresh, setRefresh }) => {
                 <ResourceCard
                   key={resource._id}
                   resource={resource}
-                  onClick={() => console.log(resource)}
+                  onClick={(e) => console.log(resource)}
                 />
               );
             })}
