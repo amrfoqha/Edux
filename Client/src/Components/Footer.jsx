@@ -1,13 +1,22 @@
+import {motion} from "motion/react";
+
 const Footer = () => {
     return (
         <footer className="bg-gray-100 text-gray-700 mt-12">
             <div className="container mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div className="space-y-2">
-                    <img
-                        src="/images/edx.webp"
-                        alt="EduX Logo"
-                        className="h-10 w-10"
-                    />
+                    <motion.div
+                        whileHover={{scale: 1.05}}
+                        whileTap={{scale: 0.95}}
+                        className="flex items-center gap-3 cursor-pointer"
+                    >
+
+                        <div>
+        <span className="font-bold text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          Edux
+        </span>
+                        </div>
+                    </motion.div>
                     <p>Empowering students through collaborative learning and resource sharing</p>
                 </div>
 

@@ -4,6 +4,7 @@ import RegisterPage from "../Pages/RegisterPage";
 import HomePage from "../Pages/HomePage.jsx";
 import BrowesResourcePage from "../Pages/BrowesResourcePage";
 import ResourceDetailsPage from "../Pages/ResourceDetailsPage";
+import AboutUs from "@/Pages/AboutUs.jsx";
 export default function UnAuthRoutes() {
   return (
     <Routes>

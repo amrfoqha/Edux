@@ -14,20 +14,33 @@ const resourceSchema = new mongoose.Schema(
     tags: [String],
     access_mode: {
       type: String,
-      enum: ["downloadable", "requestable"],
+      enum: ["downloadable", "requestable", "external", "generated"],
       default: "downloadable",
     },
-    files: [String],
+    files: { type: [String], default: [] },
     thumbnail: String,
     uploader: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       index: true,
     },
+    url: { type: String, default: "" },
     average_rating: { type: Number, default: 0 },
   },
   {
     timestamps: true,
   }
 );
+
+
+resourceSchema.pre("validate", function (next) {
+  if (["generated", "external"].includes(this.access_mode)) {
+    if (!this.url || !this.url.trim()) {
+      return next(new Error("url is required when access_mode is generated or external"));
+    }
+  }
+  next();
+});
+
+
 module.exports = Resource = mongoose.model("Resource", resourceSchema);
