@@ -255,6 +255,7 @@ const ResourceDetailsPage = () => {
               size="lg"
               variant={isFavorite ? "secondary" : "outline"}
               onClick={() => {
+                if(!user)navigate("/login");
                 addToFavorite(resource._id);
               }}
               className="px-8 py-6 text-base"
