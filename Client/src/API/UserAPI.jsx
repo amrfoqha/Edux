@@ -17,7 +17,6 @@ export const getAllUsers = async () => {
 // Get user by ID
 export const getUserById = async (id) => {
   const res = await api.get(`/users/${id}`);
-  console.log(res.data);
   return res.data;
 };
 

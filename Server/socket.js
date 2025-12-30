@@ -4,6 +4,7 @@ const Notification = require("./models/notification.model");
 const User = require("./models/User.model");
 const RoomMember = require("./models/room_member.model");
 const RoomMessage = require("./models/room_message.model");
+const RoomModel = require("./models/room_member.model");
 
 const EVENTS = Object.freeze({
   PRESENCE_SNAPSHOT: "presence:snapshot",
@@ -144,6 +145,7 @@ module.exports = function (io) {
       });
 
       // Notify recipient even if not in DM page
+      console.log("DM notification", notification);
       io.to(USER_ROOM(to)).emit(EVENTS.DM_NOTIFICATION, {
         user: notification.user,
         type: notification.type,
@@ -202,7 +204,6 @@ module.exports = function (io) {
 
       // enforce membership
       const isMember = await RoomMember.exists({ room: roomId, user: userId });
-      console.log(isMember);
 
       if (!isMember) return;
 
@@ -214,20 +215,8 @@ module.exports = function (io) {
           sender: userId,
           message: message.trim(),
         });
-
-        const answer = await Notification.create({
-          user: to,
-          type: "room",
-          sender: userId,
-          message: message?.slice(0, 50) || "",
-          isRead: false,
-          room: roomId,
-        });
-        const populated = await answer.populate("sender");
-        await User.findByIdAndUpdate(answer.sender, {
-          $addToSet: { notifications: answer._id },
-        });
-        notification = populated;
+        const roomMembers = await RoomMember.find({ room: roomId });
+        const to = roomMembers.filter((member) => member.user !== userId);
       } catch (err) {
         console.error("Error saving room message:", err);
         return;
@@ -246,17 +235,42 @@ module.exports = function (io) {
 
       // optional: notify all room members (even if they aren’t inside the room page)
       try {
-        const members = await RoomMember.find({ room: roomId }).select("user");
-        members.forEach((m) => {
-          const memberId = String(m.user);
-          if (memberId !== String(userId)) {
-            io.to(USER_ROOM(memberId)).emit(EVENTS.ROOM_NOTIFICATION, {
-              roomId,
-              senderId: userId,
-              message: saved.message,
-            });
-          }
-        });
+        const members = await RoomMember.find({ room: roomId }).populate(
+          "user"
+        );
+
+        for (const m of members) {
+          // لا تبعت إشعار لنفسك
+          if (String(m.user._id) === String(userId)) continue;
+
+          let notification = await Notification.create({
+            type: "room",
+            user: m.user._id, // receiver
+            sender: userId,
+            room: roomId,
+            message: message?.slice(0, 50) || "",
+            isRead: false,
+          });
+
+          notification = await notification.populate("sender user room");
+
+          // خزّن الإشعار عند العضو
+          await User.findByIdAndUpdate(m.user._id, {
+            $addToSet: { notifications: notification._id },
+          });
+
+          console.log("notification", notification);
+          io.to(USER_ROOM(m.user._id)).emit(EVENTS.ROOM_NOTIFICATION, {
+            _id: notification._id,
+            user: notification.user,
+            type: notification.type,
+            sender: notification.sender,
+            room: notification.room,
+            message: notification.message,
+            isRead: notification.isRead,
+            createdAt: notification.createdAt,
+          });
+        }
       } catch (e) {
         console.error("ROOM_NOTIFICATION error:", e);
       }

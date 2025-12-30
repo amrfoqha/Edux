@@ -17,7 +17,6 @@ export function Navbar({ currentPage, isLoggedIn }) {
 
   const onNavigate = useNavigate();
   const { logout } = useAuth();
-
   const onMarkAsRead = async (id) => {
     try {
       await toggleNotificationRead(id);
@@ -28,14 +27,24 @@ export function Navbar({ currentPage, isLoggedIn }) {
       console.log(error);
     }
   };
-
   useEffect(() => {
-    socket.on(EVENTS.DM_NOTIFICATION, (data) => {
+    const onDM = (data) => {
+      console.log("DM_NOTIFICATION", data);
       setNotifications((prev) => [...prev, data]);
-    });
-    socket.on(EVENTS.ROOM_NOTIFICATION, (data) => {
+    };
+
+    const onRoom = (data) => {
+      console.log("ROOM_NOTIFICATION", data);
       setNotifications((prev) => [...prev, data]);
-    });
+    };
+
+    socket.on(EVENTS.DM_NOTIFICATION, onDM);
+    socket.on(EVENTS.ROOM_NOTIFICATION, onRoom);
+
+    return () => {
+      socket.off(EVENTS.DM_NOTIFICATION, onDM);
+      socket.off(EVENTS.ROOM_NOTIFICATION, onRoom);
+    };
   }, []);
 
   return (
@@ -53,6 +62,7 @@ export function Navbar({ currentPage, isLoggedIn }) {
           isLoggedIn={isLoggedIn}
           onLogout={logout}
           notifications={notifications}
+          setNotifications={setNotifications}
           onMarkAsRead={onMarkAsRead}
         />
 
@@ -74,6 +84,7 @@ export function Navbar({ currentPage, isLoggedIn }) {
         isLoggedIn={isLoggedIn}
         onLogout={logout}
         notifications={notifications}
+        setNotifications={setNotifications}
         onMarkAsRead={onMarkAsRead}
       />
     </motion.nav>
