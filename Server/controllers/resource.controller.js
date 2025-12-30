@@ -70,6 +70,7 @@ module.exports.getResourcesByPage = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const { q, type, university, faculty, department } = req.query;
+    // console.log(q, type, university, faculty, department);
     const filter = {};
 
     if (q && q.trim()) {

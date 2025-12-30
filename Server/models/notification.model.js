@@ -8,11 +8,21 @@ const notificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["request", "review", "approval"],
-      default: "request",
+      enum: ["request", "review", "approval", "dm", "room"],
+      default: "dm",
     },
     message: String,
     isRead: { type: Boolean, default: false },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      index: true,
+    },
+    room: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Room",
+      index: true,
+    },
   },
   {
     timestamps: true,
