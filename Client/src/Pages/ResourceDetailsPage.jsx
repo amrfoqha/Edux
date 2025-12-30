@@ -26,6 +26,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Textarea } from "../Components/ui/TextArea";
+import RelatedResources from "@/Components/RelatedResources.jsx";
 
 const ResourceDetailsPage = () => {
   const navigate = useNavigate();
@@ -52,7 +53,6 @@ const ResourceDetailsPage = () => {
       totalReviews ? Number(totalRating / totalReviews).toFixed(1) : 0
     );
   };
-
   const handleSubmitReview = async () => {
     if (!user) {
       navigate("/login");
@@ -401,8 +401,15 @@ const ResourceDetailsPage = () => {
                   </div>
                 ))}
               </div>
+
+
+
             </CardContent>
           </Card>
+          <RelatedResources
+              resourceId={resource._id}
+              onNavigate={navigate}
+          />
         </div>
       </main>
 

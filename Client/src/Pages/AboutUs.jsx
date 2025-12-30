@@ -1,10 +1,8 @@
-import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 
 const AboutUs = () => {
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
-            <Header />
 
             <section className="bg-gradient-to-b from-purple-50 to-pink-50 py-24 text-center">
                 <div className="container mx-auto px-6">
@@ -47,7 +45,7 @@ const AboutUs = () => {
             <section className="py-24 bg-white">
                 <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
                     <img
-                        src={missionImg}
+                        src={"https://images.unsplash.com/photo-1764079833254-a14555e35d9e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=1080"}
                         alt="Our Mission"
                         className="rounded-3xl shadow-lg"
                     />
