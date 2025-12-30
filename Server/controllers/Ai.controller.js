@@ -35,12 +35,31 @@ function extractFirstJsonArray(text = "") {
     return cleaned.slice(start, end + 1).trim();
 }
 
+function safeParseJsonArray(text = "") {
+    const arrText = extractFirstJsonArray(text) || stripCodeFences(text);
+    try {
+        const parsed = JSON.parse(arrText);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        const cleaned = stripCodeFences(text);
+        const objs = [];
+        const matches = cleaned.match(/\{[\s\S]*?\}/g) || [];
+        for (const m of matches) {
+            try {
+                objs.push(JSON.parse(m));
+            } catch {}
+        }
+        return objs;
+    }
+}
 
 function isAllowedUrl(url) {
     try {
         const u = new URL(url);
         if (u.protocol !== "https:") return false;
-        return ALLOWED_DOMAINS.some((d) => u.hostname === d || u.hostname.endsWith(`.${d}`));
+        return ALLOWED_DOMAINS.some(
+            (d) => u.hostname === d || u.hostname.endsWith(`.${d}`)
+        );
     } catch {
         return false;
     }
@@ -60,28 +79,93 @@ function pickCandidateFields(r) {
     };
 }
 
-
-async function deepseekText(prompt,{ max_tokens = 800 } = {}) {
-    const resp = await openrouter.chat.send({
-        model: "deepseek/deepseek-r1-0528:free",
-        messages: [
-            {
-                role: "system",
-                content:
-                    "You are a backend recommendation engine. Follow instructions strictly and output ONLY what is requested.",
-            },
-            {
-                role: "user",
-                content: prompt,
-            },
-        ],
-        temperature: 0.2,
-        max_tokens,
-    });
-
-    return resp?.choices?.[0]?.message?.content || "";
+async function sleep(ms) {
+    return new Promise((r) => setTimeout(r, ms));
 }
 
+async function listOpenRouterModels() {
+    const r = await fetch("https://openrouter.ai/api/v1/models", {
+        headers: { Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}` },
+    });
+    if (!r.ok) throw new Error(`Models API failed: ${r.status}`);
+    const data = await r.json();
+    return data?.data ?? data?.models ?? [];
+}
+
+async function pickDeepSeekFreeModels() {
+    const preferred = [
+        "deepseek/deepseek-r1-0528:free",
+        "deepseek/deepseek-chat-v3-0324:free",
+    ];
+
+    const models = await listOpenRouterModels();
+    const ids = models.map((m) => m.id).filter(Boolean);
+
+    const picked = [];
+
+    for (const p of preferred) if (ids.includes(p)) picked.push(p);
+
+    for (const id of ids) {
+        if (id.startsWith("deepseek/") && id.includes(":free") && !picked.includes(id)) {
+            picked.push(id);
+        }
+    }
+
+    return picked.length ? picked : ["deepseek/deepseek-r1-0528:free"];
+}
+
+async function llmJsonText(prompt, { max_tokens = 800, prefill = "" } = {}) {
+    let modelList = [];
+    try {
+        modelList = await pickDeepSeekFreeModels();
+    } catch {
+        modelList = ["deepseek/deepseek-r1-0528:free"];
+    }
+
+    const baseMessages = [
+        {
+            role: "system",
+            content: "Return ONLY valid JSON. No markdown. No backticks. No extra text.",
+        },
+        { role: "user", content: prompt },
+    ];
+
+    for (const model of modelList) {
+        for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+                const messages = [...baseMessages];
+
+                if (prefill) messages.push({ role: "assistant", content: prefill });
+
+                const resp = await openrouter.chat.send({
+                    model,
+                    messages,
+                    temperature: 0.2,
+                    max_tokens,
+                });
+
+                const text = resp?.choices?.[0]?.message?.content?.trim() || "";
+                if (text) return text;
+
+                await sleep(250 * attempt);
+            } catch (e) {
+                const status = e?.statusCode || e?.status || e?.response?.status;
+                const msg =
+                    e?.message ||
+                    e?.body ||
+                    e?.error?.message ||
+                    e?.response?.data?.error?.message ||
+                    String(e);
+
+                console.error("[llmJsonText] failed", { model, attempt, status, msg });
+                // retry on transient failures
+                await sleep(250 * attempt);
+            }
+        }
+    }
+
+    return "";
+}
 
 module.exports.getRelatedResources = async (req, res) => {
     try {
@@ -100,24 +184,14 @@ module.exports.getRelatedResources = async (req, res) => {
         const candidatePayload = candidates.map(pickCandidateFields);
 
         let chosenIds = [];
-
-        // ---------- 1) PICK RELATED IDs ----------
         if (candidatePayload.length) {
-            const prompt = `
-You are a recommendation engine.
+            const promptPick = `
+Pick the best ${limit} RELATED resources from candidates[] for CURRENT by TOPIC similarity (title + description).
+Choose ONLY from candidates[].id.
+Return ONLY JSON in this exact shape:
+{"relatedIds":["id1","id2"],"needGenerate":0}
 
-Pick the best ${limit} RELATED resources from candidates[] for CURRENT.
-
-"Related" means HIGH TOPIC similarity using title + description.
-Do NOT pick just because same university/faculty—topic similarity is required.
-
-Rules:
-- Choose ONLY from candidates[].id
-- Return STRICT RAW JSON ONLY (no markdown, no \`\`\`)
-- If you cannot find ${limit} good matches, return fewer and set needGenerate.
-
-Return:
-{ "relatedIds": ["id1","id2"], "needGenerate": 1 }
+If you cannot find enough good matches, return fewer IDs and set needGenerate to the remaining count.
 
 CURRENT:
 ${JSON.stringify(pickCandidateFields(current))}
@@ -125,104 +199,94 @@ ${JSON.stringify(pickCandidateFields(current))}
 CANDIDATES:
 ${JSON.stringify(candidatePayload)}
 `;
-            const pickText = await deepseekText(prompt, { max_tokens: 300 });
-            console.log("textttt       " + pickText);
-            let json;
+
+            const pickText = await llmJsonText(promptPick, { max_tokens: 300, prefill: "{" });
+
+            let pickJson = { relatedIds: [], needGenerate: limit };
             try {
-                const jsonText =
-                    extractFirstJsonObject(pickText) || stripCodeFences(pickText);
-                json = JSON.parse(jsonText);
-            } catch (e) {
-                console.error("DeepSeek pick JSON failed:", pickText);
-                json = { relatedIds: [], needGenerate: limit };
+                const jsonText = extractFirstJsonObject(pickText) || stripCodeFences(pickText);
+                pickJson = JSON.parse(jsonText);
+            } catch {
             }
 
-            console.log("json      " + json)
-
-
             const candidateIdSet = new Set(candidatePayload.map((c) => c.id));
-            chosenIds = Array.isArray(json.relatedIds)
-                ? json.relatedIds.map(String).filter((id) => candidateIdSet.has(id))
+            chosenIds = Array.isArray(pickJson.relatedIds)
+                ? pickJson.relatedIds.map(String).filter((id) => candidateIdSet.has(id))
                 : [];
         }
 
-        // Fetch chosen resources
         const chosen = chosenIds.length
             ? await Resource.find({ _id: { $in: chosenIds } }).lean()
             : [];
 
-        // ---------- 2) GENERATE EXTERNAL (URL) RESOURCES IF NEEDED ----------
         const need = chosen.length === 0 ? limit : 0;
         let generated = [];
 
         if (need > 0) {
             const promptGen = `
-Create ${need} NEW external resources related to CURRENT by TOPIC similarity.
+Create EXACTLY ${need} external resources for the SAME TOPIC as CURRENT.
 
-Constraints:
-- Return STRICT RAW JSON ARRAY ONLY (no markdown, no \`\`\`)
-- Each item:
-  - title (string)
-  - type ("book"|"slides"|"course"|"exam"|"video")
-  - description (1-2 lines)
-  - url (https) from trusted sources:
-    Wikipedia / OpenStax / WorldCat / MIT OCW / MIT domains
+Return ONLY a JSON array. No markdown.
+Each item MUST be exactly:
+{"title":"...","type":"book|slides|course|exam|video","description":"(<=120 chars)","url":"https://..."}
 
-Return exactly an array like:
-[
-  {"title":"...","type":"book","description":"...","url":"https://..."}
-]
+Allowed domains ONLY:
+wikipedia.org, worldcat.org, openstax.org, ocw.mit.edu, mit.edu
 
 CURRENT:
-${JSON.stringify(pickCandidateFields(current))}
+${JSON.stringify({ title: current.title, type: current.type, description: current.description || "" })}
 `;
 
-            const genText  = await deepseekText(promptGen, { max_tokens: 1200 });
+            const genText = await llmJsonText(promptGen, { max_tokens: 900, prefill: "[" });
 
-            let arr;
-            try {
-                const arrText =
-                    extractFirstJsonArray(genText) || stripCodeFences(genText);
-                arr = JSON.parse(arrText);
-            } catch (e) {
-                console.error("DeepSeek gen JSON failed:", genText);
-                arr = [];
-            }
+            console.log("Generated exactly:", genText);
+            const arr = genText ? safeParseJsonArray(genText) : [];
 
+            console.log("\n\n\n\n\narr    " + arr);
 
-            const toCreate = (Array.isArray(arr) ? arr : [])
-                .slice(0, need)
-                .map((x) => ({
-                    title: String(x.title || `External resource for ${current.title}`),
-                    type: ["book", "slides", "course", "exam", "video"].includes(x.type)
-                        ? x.type
-                        : current.type || "book",
-                    description: String(x.description || `External resource related to ${current.title}.`),
-                    url: String(x.url || "").trim(),
-                }));
+            const toCreate = arr.slice(0, need).map((x) => ({
+                title: String(x.title || `External resource for ${current.title}`),
+                type: ["book", "slides", "course", "exam", "video"].includes(x.type)
+                    ? x.type
+                    : current.type || "book",
+                description: String(x.description || `External resource related to ${current.title}.`).slice(0, 120),
+                url: String(x.url || "").trim(),
+            }));
+
+            console.log("\n\n\n\n\nToCreat    " + toCreate);
 
             const safeCreate = toCreate.filter((x) => isAllowedUrl(x.url));
 
-            if (safeCreate.length) {
-                const created = await Resource.insertMany(
-                    safeCreate.map((x) => ({
-                        title: x.title,
-                        type: x.type,
-                        description: x.description,
-                        university: current.university,
-                        faculty: current.faculty,
-                        department: current.department,
-                        tags: [],
-                        access_mode: "generated",
-                        files: [],
-                        url: x.url,
-                        uploader: null,
-                        thumbnail: "",
-                    })),
-                    { ordered: false }
-                );
+            const util = require("util");
+            console.log("safeCreate length:", safeCreate.length);
+            console.log("safeCreate:", util.inspect(safeCreate, { depth: null, colors: true }));
+            console.log("current.department:", current.department);
 
-                generated = created.map((d) => (d.toObject?.() ?? d));
+            if (safeCreate.length) {
+                const docsToInsert = safeCreate.map((x) => ({
+                    title: x.title,
+                    type: x.type,
+                    description: x.description,
+                    university: current.university,
+                    faculty: current.faculty,
+                    department: current.department || "General",
+                    tags: [],
+                    access_mode: "generated",
+                    files: [],
+                    url: x.url,
+                    thumbnail: "",
+                    // uploader: current.uploader, // optional if you want
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                }));
+
+                const insertResult = await Resource.collection.insertMany(docsToInsert, {
+                    ordered: false,
+                });
+
+                const insertedIds = Object.values(insertResult.insertedIds).map((v) => v);
+
+                generated = await Resource.find({ _id: { $in: insertedIds } }).lean();
             }
         }
 
