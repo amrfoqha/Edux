@@ -13,6 +13,11 @@ const roomMessageSchema = new mongoose.Schema(
     },
     message: String,
     isRead: { type: Boolean, default: false },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      index: true,
+    },
   },
   {
     timestamps: true,

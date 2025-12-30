@@ -17,6 +17,7 @@ export const getAllUsers = async () => {
 // Get user by ID
 export const getUserById = async (id) => {
   const res = await api.get(`/users/${id}`);
+  console.log(res.data);
   return res.data;
 };
 
@@ -46,8 +47,8 @@ export const loginUser = async (email, password) => {
 
 // Logout
 export const logoutUser = async () => {
-    const res = await api.post("/auth/logout");
-    return res.data;
+  const res = await api.post("/auth/logout");
+  return res.data;
 };
 
 // Authentication
