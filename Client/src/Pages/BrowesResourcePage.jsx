@@ -95,7 +95,7 @@ const BrowesResourcePage = () => {
               <div className="flex justify-evenly mt-6  ">
                 <FilterSelect
                   placeholder="Resource Type"
-                  defaultValue={type}
+                  value={type || ""}
                   onChange={setType}
                   className="w-full lg:w-32 text-xl"
                   options={[
@@ -106,7 +106,7 @@ const BrowesResourcePage = () => {
                 />
                 <FilterSelect
                   placeholder="University"
-                  defaultValue={university || universities[0]}
+                  value={university || ""}
                   onChange={setUniversity}
                   className="w-full lg:w-86 text-xl"
                   options={universities.map((university) => ({
@@ -118,7 +118,7 @@ const BrowesResourcePage = () => {
                 <FilterSelect
                   placeholder="Faculty"
                   onChange={setFaculty}
-                  defaultValue={faculty || faculties[0]}
+                  value={faculty || ""}
                   className="w-full lg:w-52 text-xl"
                   options={faculties.map((faculty) => ({
                     value: faculty,
@@ -128,7 +128,7 @@ const BrowesResourcePage = () => {
                 <FilterSelect
                   placeholder="Department"
                   onChange={setDepartment}
-                  defaultValue={department || ""}
+                  value={department || ""}
                   className="w-full lg:w-62 text-xl"
                   options={departments[faculty]?.map((department) => ({
                     value: department,
@@ -140,11 +140,11 @@ const BrowesResourcePage = () => {
                 type="button"
                 onClick={() => {
                   setSearch("");
-                  setUniversity(universities[0]);
-                  setFaculty(faculties[0]);
-                  setDepartment(departments[faculties[0]][0]);
-                  setType("book");
-                  setFilterOpen(false);
+                  setUniversity("");
+                  setFaculty("");
+                  setDepartment("");
+                  setType("");
+                  // setFilterOpen(false);
                 }}
                 className="bg-primary text-white px-4 py-2 rounded-2xl w-1/3 mx-auto mt-2 cursor-pointer"
               >

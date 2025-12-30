@@ -8,23 +8,26 @@ import { useAuth } from "../Hooks/useAuth.jsx";
 import BrowesResourcePage from "../Pages/BrowesResourcePage";
 import ResourceDetailsPage from "../Pages/ResourceDetailsPage";
 import RoomsPage from "@/Pages/RoomsPage.jsx";
-import {CreateRoomPage} from "@/Pages/CreateRoomPage.jsx";
-
+import { CreateRoomPage } from "@/Pages/CreateRoomPage.jsx";
+import AboutUs from "../Pages/AboutUs";
 export default function AuthRoutes() {
-    const {user} = useAuth();
-    return (
-        <Routes>
-            <Route path="/" element={<HomePage/>}/>
-            <Route path="/chat" element={<ChatPage/>}/>
-            <Route path="/rooms" element={<RoomsPage/>}/>
-            <Route path="/dm/:otherUserId" element={<DirectMessagePage currentUser={user}/>}/>
-            <Route path="/group/:id" element={<GroupChatPage currentUser={user}/>}/>
-            <Route path="/profile" element={<UserProfile/>}/>
-            <Route path="/browse" element={<BrowesResourcePage/>}/>
-            <Route path="/add-room" element={<CreateRoomPage/>}/>
-            <Route path="*" element={<Navigate to="/" replace/>}/>
-            <Route path="/resources/:id" element={<ResourceDetailsPage/>}/>
-        </Routes>
-    );
-
+  const { user } = useAuth();
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/chat" element={<ChatPage />} />
+      <Route path="/rooms" element={<RoomsPage />} />
+      <Route
+        path="/dm/:otherUserId"
+        element={<DirectMessagePage currentUser={user} />}
+      />
+      <Route path="/group/:id" element={<GroupChatPage currentUser={user} />} />
+      <Route path="/profile" element={<UserProfile />} />
+      <Route path="/browse" element={<BrowesResourcePage />} />
+      <Route path="/add-room" element={<CreateRoomPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/resources/:id" element={<ResourceDetailsPage />} />
+      <Route path="/about" element={<AboutUs />} />
+    </Routes>
+  );
 }
