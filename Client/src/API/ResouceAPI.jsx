@@ -115,3 +115,12 @@ export const updateResourceAverageRating = async (id, avgRating) => {
     throw error;
   }
 };
+
+export const getRelatedResource = async (id) => {
+  try {
+    const response = await api.get(`/resources/${id}/related?limit=3`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting resource average rating:", error);
+  }
+}

@@ -1,7 +1,7 @@
 import { BookOpen } from "lucide-react";
 import { motion } from "motion/react";
 
-export default function Logo({ onClick }) {
+export default function Logo({ onClick,size }) {
     return (
         <motion.div
             onClick={onClick}
@@ -10,7 +10,7 @@ export default function Logo({ onClick }) {
             className="flex items-center gap-3 cursor-pointer"
         >
             <div className="bg-gradient-to-br from-primary to-secondary p-3 rounded-2xl">
-                <BookOpen className="text-white h-7 w-7" />
+                <BookOpen size={size} className="text-white h-7 w-7" />
             </div>
             <div>
         <span className="font-bold text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
