@@ -67,7 +67,7 @@ const RoomsPage = () => {
                     ))}
                 </div>
                 <div className={"mt-8"}>
-                    {rooms?.length ? <RoomsGrid rooms={rooms}/> : <RoomsEmptyState/>}
+                    {rooms?.length ? <RoomsGrid rooms={rooms} setRooms={setRooms}/> : <RoomsEmptyState/>}
                 </div>
 
             </div>
