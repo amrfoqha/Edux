@@ -313,26 +313,43 @@ const ResourceDetailsPage = () => {
           </div>
 
           <div className="flex flex-wrap gap-4 pt-4">
-            <div className="flex flex-wrap gap-4 pt-4">
-              {(() => {
-                const config = ACCESS_MODE_CONFIG[resource.access_mode];
-
-                if (!config) return null;
-
-                const Icon = config.icon;
-
-                return (
-                    <Button
-                        size="lg"
-                        variant={config.variant}
-                        className="px-8 py-6 text-base"
-                        onClick={() => config.action(resource)}
-                    >
-                      <Icon className="h-5 w-5 mr-2" />
-                      {config.label}
-                    </Button>
-                );
-              })()}
+            <div className="flex flex-wrap gap-4">
+              {resource.privacy === "public" ||
+              user?._id === resource?.uploader?._id ||
+              requestStatus === "approved" ? (
+                  <Button
+                      size="lg"
+                      className="px-8 py-6 text-base"
+                      onClick={() => downloadAll(resource._id, resource.title)}
+                  >
+                    <Download className="h-5 w-5 mr-2" />
+                    Download Resource
+                  </Button>
+              ) : requestStatus === "pending" ? (
+                  <Button size="lg" className="px-8 py-6 text-base" disabled>
+                    <Download className="h-5 w-5 mr-2" />
+                    Pending ...
+                  </Button>
+              ) : (
+                  <Button
+                      size="lg"
+                      className="px-8 py-6 text-base"
+                      onClick={() => {
+                        if (!user) {
+                          navigate("/login");
+                          return;
+                        }
+                        RequestResource(
+                            resource._id,
+                            resource.uploader._id,
+                            user._id
+                        );
+                      }}
+                  >
+                    <Download className="h-5 w-5 mr-2" />
+                    Request Resource
+                  </Button>
+              )}
             </div>
 
             {/* 
