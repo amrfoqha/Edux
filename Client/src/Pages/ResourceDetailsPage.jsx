@@ -7,7 +7,7 @@ import {
 } from "../API/ResouceAPI";
 import Footer from "../Components/Footer";
 import { Button } from "../Components/ui/button";
-import { ArrowLeft, Download, Flag, Heart, Share2, Star } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink,Flag, Heart, Share2, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "../components/ui/badge";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
