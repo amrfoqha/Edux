@@ -14,7 +14,7 @@ export default function FilterSelect({
   className = "",
 }) {
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={value} onValueChange={(e) => onChange(e)}>
       <SelectTrigger
         className={`h-[54px] rounded-2xl bg-primary/5 border-0 ${className}`}
       >
