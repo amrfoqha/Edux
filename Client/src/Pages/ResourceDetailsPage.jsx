@@ -46,6 +46,39 @@ const ResourceDetailsPage = () => {
     { stars: 5, count: 0, percentage: 0 },
   ]);
 
+  const ACCESS_MODE_CONFIG = {
+    downloadable: {
+      label: "Download Resource",
+      icon: Download,
+      action: (resource) => downloadAll(resource._id, resource.title),
+      variant: "default",
+    },
+
+    external: {
+      label: "Open Resource",
+      icon: ExternalLink,
+      action: (resource) => window.open(resource.url, "_blank"),
+      variant: "outline",
+    },
+
+    generated: {
+      label: "Open Resource",
+      icon: ExternalLink,
+      action: (resource) => window.open(resource.url, "_blank"),
+      variant: "outline",
+    },
+
+    requestable: {
+      label: "Request Resource",
+      icon: Flag,
+      action: (resource) => {
+        console.log("Requesting resource:", resource._id);
+      },
+      variant: "secondary",
+    },
+  };
+
+
   const calculateRatingAvg = (reviews) => {
     const totalReviews = reviews.length;
     const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
@@ -233,14 +266,28 @@ const ResourceDetailsPage = () => {
           </div>
 
           <div className="flex flex-wrap gap-4 pt-4">
-            <Button
-              size="lg"
-              className="px-8 py-6 text-base"
-              onClick={() => downloadAll(resource._id, resource.title)}
-            >
-              <Download className="h-5 w-5 mr-2" />
-              Download Resource
-            </Button>
+            <div className="flex flex-wrap gap-4 pt-4">
+              {(() => {
+                const config = ACCESS_MODE_CONFIG[resource.access_mode];
+
+                if (!config) return null;
+
+                const Icon = config.icon;
+
+                return (
+                    <Button
+                        size="lg"
+                        variant={config.variant}
+                        className="px-8 py-6 text-base"
+                        onClick={() => config.action(resource)}
+                    >
+                      <Icon className="h-5 w-5 mr-2" />
+                      {config.label}
+                    </Button>
+                );
+              })()}
+            </div>
+
             {/* 
             <Link
               to={`http://localhost:8000/api/resources/${resource._id}/download-all`}
