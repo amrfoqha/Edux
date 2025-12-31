@@ -54,12 +54,18 @@ export function Navbar({ currentPage, isLoggedIn }) {
       setNotifications((prev) => [...prev, data]);
     };
 
+    const onRequest = (data) => {
+      console.log("REQUEST_NOTIFICATION", data);
+      setNotifications((prev) => [...prev, data]);
+    };
+    socket.on(EVENTS.REQUEST_NOTIFICATION, onRequest);
     socket.on(EVENTS.DM_NOTIFICATION, onDM);
     socket.on(EVENTS.ROOM_NOTIFICATION, onRoom);
 
     return () => {
       socket.off(EVENTS.DM_NOTIFICATION, onDM);
       socket.off(EVENTS.ROOM_NOTIFICATION, onRoom);
+      socket.off(EVENTS.REQUEST_NOTIFICATION, onRequest);
     };
   }, []);
 
