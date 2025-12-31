@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "motion/react";
 import RoomCard from "./RoomCard.jsx";
 
-export default function RoomsGrid({ rooms = [] }) {
+export default function RoomsGrid({ rooms = [],setRooms }) {
     const container = {
         hidden: { opacity: 0 },
         show: { opacity: 1, transition: { staggerChildren: 0.08 } },
@@ -22,7 +22,9 @@ export default function RoomsGrid({ rooms = [] }) {
         >
             {rooms.map((room) => (
                 <motion.div key={room._id} variants={item}>
-                    <RoomCard
+                    <RoomCard onJoined={(roomId) => {
+                        setRooms(prev => prev.map(r => r._id === roomId ? { ...r, isMember: true, memberCount: r.memberCount + 1 } : r));
+                    }}
                         room={room}
                     />
                 </motion.div>
