@@ -27,6 +27,12 @@ import {
 } from "../components/ui/card";
 import { Textarea } from "../Components/ui/TextArea";
 import RelatedResources from "@/Components/RelatedResources.jsx";
+import {
+  createRequestResource,
+  getResourceStatus,
+} from "../API/RequestResourceAPI";
+import socket from "../socket";
+import { EVENTS } from "../socket/events";
 
 const ResourceDetailsPage = () => {
   const navigate = useNavigate();
@@ -45,6 +51,27 @@ const ResourceDetailsPage = () => {
     { stars: 4, count: 0, percentage: 0 },
     { stars: 5, count: 0, percentage: 0 },
   ]);
+  const [requestStatus, setRequestStatus] = useState("");
+
+  useEffect(() => {
+    const handleRequestNotification = (data) => {
+      // If the notification is about this resource and for this user
+      if (
+        data.resource?._id === id &&
+        data.request?.requestor === user?._id &&
+        data.type === "request"
+      ) {
+        console.log("Request status update:", data.request.status);
+        setRequestStatus(data.request.status);
+      }
+    };
+
+    socket.on(EVENTS.REQUEST_NOTIFICATION, handleRequestNotification);
+
+    return () => {
+      socket.off(EVENTS.REQUEST_NOTIFICATION, handleRequestNotification);
+    };
+  }, [id, user]);
 
   const ACCESS_MODE_CONFIG = {
     downloadable: {
@@ -109,6 +136,15 @@ const ResourceDetailsPage = () => {
     }
   };
 
+  const RequestResource = async (resource, owner, requestor) => {
+    try {
+      await createRequestResource(resource, owner, requestor);
+      setRequestStatus("pending");
+    } catch (error) {
+      console.error("Error crate a request:", error);
+    }
+  };
+
   const calculateRatingDistribution = (reviews) => {
     const totalReviews = reviews?.length || 0;
 
@@ -127,7 +163,17 @@ const ResourceDetailsPage = () => {
   useEffect(() => {
     calculateRatingDistribution(reviews);
     calculateRatingAvg(reviews);
-  }, [reviews]);
+    const fetchResourceSatatus = async (id, user) => {
+      try {
+        const res = await getResourceStatus(id, user);
+        console.log(res);
+        setRequestStatus(res);
+      } catch (error) {
+        console.error("Error get status:", error);
+      }
+    };
+    if (user) fetchResourceSatatus(id, user?._id);
+  }, [reviews, user]);
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -185,6 +231,7 @@ const ResourceDetailsPage = () => {
     const fetchResource = async () => {
       try {
         const data = await getResource(id);
+        console.log(data);
         setResource(data);
       } catch (error) {
         console.error("Error fetching resource:", error);
@@ -302,7 +349,7 @@ const ResourceDetailsPage = () => {
               size="lg"
               variant={isFavorite ? "secondary" : "outline"}
               onClick={() => {
-                if(!user)navigate("/login");
+                if (!user) navigate("/login");
                 addToFavorite(resource._id);
               }}
               className="px-8 py-6 text-base"
@@ -448,15 +495,9 @@ const ResourceDetailsPage = () => {
                   </div>
                 ))}
               </div>
-
-
-
             </CardContent>
           </Card>
-          <RelatedResources
-              resourceId={resource._id}
-              onNavigate={navigate}
-          />
+          <RelatedResources resourceId={resource._id} onNavigate={navigate} />
         </div>
       </main>
 

@@ -10,6 +10,7 @@ import ResourceDetailsPage from "../Pages/ResourceDetailsPage";
 import RoomsPage from "@/Pages/RoomsPage.jsx";
 import { CreateRoomPage } from "@/Pages/CreateRoomPage.jsx";
 import AboutUs from "../Pages/AboutUs";
+import RequestPage from "../Pages/RequestPage";
 export default function AuthRoutes() {
   const { user } = useAuth();
   return (
@@ -27,6 +28,7 @@ export default function AuthRoutes() {
       <Route path="/add-room" element={<CreateRoomPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
       <Route path="/resources/:id" element={<ResourceDetailsPage />} />
+      <Route path="/requestPage" element={<RequestPage />} />
       <Route path="/about" element={<AboutUs />} />
     </Routes>
   );

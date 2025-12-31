@@ -1,7 +1,7 @@
 import { MessageCircle } from "lucide-react";
 import NotificationsMenu from "./NotificationsMenu";
 import { Button } from "../ui/Button.jsx";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function DesktopNav({
   isLoggedIn,
@@ -11,7 +11,6 @@ export default function DesktopNav({
   setNotifications,
   onMarkAsRead,
 }) {
-  const [notificationsData, setNotificationsData] = useState(notifications);
   const [currentPage, setCurrentPage] = useState("");
   const linkClass = (page) =>
     currentPage === page
@@ -23,10 +22,6 @@ export default function DesktopNav({
     { label: "Browse", path: "/browse" },
     { label: "About", path: "/about" },
   ];
-
-  useEffect(() => {
-    setNotifications(notificationsData);
-  }, [notificationsData]);
 
   return (
     <div className="hidden md:flex items-center gap-6">
@@ -58,7 +53,7 @@ export default function DesktopNav({
 
           <NotificationsMenu
             notifications={notifications}
-            setNotificationsData={setNotificationsData}
+            setNotificationsData={setNotifications}
             onMarkAsRead={onMarkAsRead}
           />
 

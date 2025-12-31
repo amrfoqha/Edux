@@ -13,6 +13,7 @@ import {
 import { ResourceCard } from "../components/shared/ResourceCard";
 import UsePagination from "../Hooks/usePagination";
 import { useNavigate } from "react-router-dom";
+import socket from "../socket.js";
 
 const BrowesResourcePage = () => {
   const [search, setSearch] = useState("");

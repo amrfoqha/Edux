@@ -31,11 +31,12 @@ module.exports.createResource = async (req, res) => {
       $addToSet: { resources: resource._id },
     });
     res.json(populated);
-  } catch (error) {
-    if (error.name === "ValidationError") {
-      return res.status(400).json(error.errors);
-    }
-    return res.status(500).json({ message: "Server error" });
+  } catch (err) {
+    console.error("CREATE RESOURCE ERROR:", err);
+    res.status(500).json({
+      message: err.message,
+      stack: err.stack,
+    });
   }
 };
 
