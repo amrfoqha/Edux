@@ -176,7 +176,6 @@ module.exports = function (io) {
 
       socket.join(ROOM_ROOM(roomId));
 
-      // optional: tell others someone joined
       socket.to(ROOM_ROOM(roomId)).emit("room:presence", {
         roomId,
         userId,
@@ -202,7 +201,7 @@ module.exports = function (io) {
 
       // enforce membership
       const isMember = await RoomMember.exists({ room: roomId, user: userId });
-      console.log(isMember);
+      console.log("is this null? " +isMember);
 
       if (!isMember) return;
 
@@ -244,7 +243,6 @@ module.exports = function (io) {
       // emit to everyone else in room
       socket.to(ROOM_ROOM(roomId)).emit(EVENTS.ROOM_RECEIVE, payload);
 
-      // optional: notify all room members (even if they aren’t inside the room page)
       try {
         const members = await RoomMember.find({ room: roomId }).select("user");
         members.forEach((m) => {

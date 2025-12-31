@@ -4,13 +4,7 @@ import { ExternalLink, Star } from "lucide-react";
 import { Badge } from "@/Components/ui/badge.jsx";
 
 export default function RelatedResourceItem({ resource, onOpenInternal }) {
-    const isExternal = resource?.access_mode === "generated" && !!resource?.url;
-
     const handleClick = () => {
-        if (isExternal) {
-            window.open(resource.url, "_blank", "noopener,noreferrer");
-            return;
-        }
         onOpenInternal?.(resource?._id);
     };
 
