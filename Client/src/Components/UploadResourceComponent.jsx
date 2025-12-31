@@ -9,8 +9,10 @@ import FullFileUpload from "./FullFileUpload";
 import { createResource } from "../API/ResouceAPI";
 import { useAuth } from "../Hooks/useAuth";
 import { getCurrentUser } from "../API/UserAPI";
+import { useNavigate } from "react-router-dom";
 
 const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
+  const navigate = useNavigate();
   const [faculty, setFaculty] = useState(faculties[0]);
   const [department, setDepartment] = useState(departments[faculty][0]);
   const [university, setUniversity] = useState(universities[0]);
@@ -29,6 +31,7 @@ const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
     files: [],
     thumbnail: "",
     uploader: user._id,
+    privacy: "public",
   });
   const [validation, setValidation] = useState({
     title: "",
@@ -38,6 +41,7 @@ const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
     faculty: "",
     department: "",
     files: "",
+    privacy: "",
   });
   useEffect(() => {
     setOpen(cancel);
@@ -63,7 +67,8 @@ const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
       !form.university ||
       !form.faculty ||
       !form.department ||
-      !form.files.length < 1
+      !form.files.length < 1 ||
+      !form.privacy
     ) {
       return false;
     }
@@ -80,50 +85,58 @@ const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
     }
     setForm((prev) => ({ ...prev, title: e }));
   };
+  const validatePrivacy = (e) => {
+    setValidation(
+      !e
+        ? { ...validation, privacy: "Privacy is required" }
+        : { ...validation, privacy: "" }
+    );
+    setForm((prev) => ({ ...prev, privacy: e }));
+  };
   const validateType = (e) => {
-    if (!e) {
-      setValidation({ ...validation, type: "Type is required" });
-    } else {
-      setValidation({ ...validation, type: "" });
-    }
+    setValidation(
+      !e
+        ? { ...validation, type: "Type is required" }
+        : { ...validation, type: "" }
+    );
     setForm((prev) => ({ ...prev, type: e }));
   };
   const validateDescription = (e) => {
-    if (!e || e.length < 10) {
-      setValidation({
-        ...validation,
-        description: "Description must be at least 10 characters long",
-      });
-    } else {
-      setValidation({ ...validation, description: "" });
-    }
+    setValidation(
+      !e || e.length < 10
+        ? {
+            ...validation,
+            description: "Description must be at least 10 characters long",
+          }
+        : { ...validation, description: "" }
+    );
     setForm((prev) => ({ ...prev, description: e }));
   };
   const validateUniversity = (e) => {
-    if (!e) {
-      setValidation({ ...validation, university: "University is required" });
-    } else {
-      setValidation({ ...validation, university: "" });
-    }
+    setValidation(
+      !e
+        ? { ...validation, university: "University is required" }
+        : { ...validation, university: "" }
+    );
     setForm((prev) => ({ ...prev, university: e }));
     setUniversity(e);
   };
   const validateFaculty = (e) => {
-    if (!e) {
-      setValidation({ ...validation, faculty: "Faculty is required" });
-    } else {
-      setValidation({ ...validation, faculty: "" });
-    }
+    setValidation(
+      !e
+        ? { ...validation, faculty: "Faculty is required" }
+        : { ...validation, faculty: "" }
+    );
     setForm((prev) => ({ ...prev, faculty: e }));
     setFaculty(e);
     validateDepartment(departments[e][0]);
   };
   const validateDepartment = (e) => {
-    if (!e) {
-      setValidation({ ...validation, department: "Department is required" });
-    } else {
-      setValidation({ ...validation, department: "" });
-    }
+    setValidation(
+      !e
+        ? { ...validation, department: "Department is required" }
+        : { ...validation, department: "" }
+    );
     setForm((prev) => ({ ...prev, department: e }));
     setDepartment(e);
   };
@@ -136,7 +149,8 @@ const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
       form.university.length < 3 ||
       form.faculty.length < 3 ||
       form.department.length < 3 ||
-      form.files.length < 1
+      form.files.length < 1 ||
+      !form.privacy
     ) {
       setValidation({
         title: "Title is required",
@@ -146,6 +160,7 @@ const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
         faculty: "Faculty is required",
         department: "Department is required",
         files: "Files is required",
+        privacy: "Privacy is required",
       });
     } else {
       setValidation({
@@ -156,13 +171,12 @@ const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
         university: "",
         faculty: "",
         department: "",
+        privacy: "",
       });
       try {
-        const res = await createResource(form);
-        const user = await getCurrentUser();
-        user.resources.push(res._id);
-        console.log(user.resources);
-        setFlag(!flag);
+        await createResource(form);
+        setOpen(false);
+        navigate("/profile");
       } catch (error) {
         console.log(error);
       }
@@ -237,6 +251,23 @@ const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
               </select>
               {validation.type && (
                 <p className="text-red-500">{validation.type}</p>
+              )}
+            </div>
+            <div className="flex flex-col gap-2 w-1/4 mt-4">
+              <label htmlFor="">Privacy*</label>
+              <select
+                name=""
+                id=""
+                className="file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
+                onChange={(e) => validatePrivacy(e.target.value)}
+                defaultValue={"public"}
+              >
+                <option value="">Select Privacy</option>
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+              </select>
+              {validation.privacy && (
+                <p className="text-red-500">{validation.privacy}</p>
               )}
             </div>
             <div className="flex flex-col gap-2 w-1/4 mt-4">

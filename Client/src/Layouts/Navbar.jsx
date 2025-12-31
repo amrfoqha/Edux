@@ -9,24 +9,40 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Hooks/useAuth.jsx";
 import { EVENTS } from "../socket/events.js";
 import socket from "../socket.js";
-import { toggleNotificationRead } from "../API/notificationAPI";
+import {
+  toggleNotificationRead,
+  getUnReadNotifications,
+} from "../API/notificationAPI";
 
 export function Navbar({ currentPage, isLoggedIn }) {
   const [notifications, setNotifications] = useState([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const onNavigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const onMarkAsRead = async (id) => {
     try {
       await toggleNotificationRead(id);
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+        prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
       );
     } catch (error) {
       console.log(error);
     }
   };
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const res = await getUnReadNotifications(user._id);
+        console.log(res);
+        setNotifications(res);
+      } catch (error) {
+        console.log("Error fetching notifications:", error);
+      }
+    };
+    if (user) fetchNotifications();
+  }, [user]);
+
   useEffect(() => {
     const onDM = (data) => {
       console.log("DM_NOTIFICATION", data);

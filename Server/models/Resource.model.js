@@ -26,21 +26,25 @@ const resourceSchema = new mongoose.Schema(
     },
     url: { type: String, default: "" },
     average_rating: { type: Number, default: 0 },
+    privacy: {
+      type: String,
+      enum: ["public", "private"],
+      default: "public",
+    },
   },
   {
     timestamps: true,
   }
 );
 
-
-resourceSchema.pre("validate", function (next) {
+resourceSchema.pre("validate", async function () {
   if (["generated", "external"].includes(this.access_mode)) {
     if (!this.url || !this.url.trim()) {
-      return next(new Error("url is required when access_mode is generated or external"));
+      throw new Error(
+        "url is required when access_mode is generated or external"
+      );
     }
   }
-  next();
 });
-
 
 module.exports = Resource = mongoose.model("Resource", resourceSchema);

@@ -5,6 +5,8 @@ import { ResourceCard } from "../Components/shared/ResourceCard";
 import UsePagination from "../Hooks/usePagination";
 import { getUserResourcesPage } from "../API/UserAPI";
 import { useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
+import { Download, Upload } from "lucide-react";
 
 export const UploadForm = ({ refresh, setRefresh }) => {
   const [open, setOpen] = useState(false);
@@ -43,12 +45,21 @@ export const UploadForm = ({ refresh, setRefresh }) => {
           <p className="text-gray-500 text-sm">Manage your shared resources</p>
         </div>
 
-        <button
-          onClick={FormOpen}
-          className="bg-purple-600 text-white px-5 py-2 rounded-xl shadow hover:bg-purple-700 transition"
-        >
-          Upload New
-        </button>
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={() => navigate("/requestPage")}
+            size="lg"
+            variant="outline"
+            className="shadow-lg border-2"
+          >
+            <Download className="h-5 w-5 mr-2" />
+            View Requests
+          </Button>
+          <Button onClick={FormOpen} size="lg" className="shadow-lg">
+            <Upload className="h-5 w-5 mr-2" />
+            Upload New
+          </Button>
+        </div>
       </div>
 
       {/* Empty State */}

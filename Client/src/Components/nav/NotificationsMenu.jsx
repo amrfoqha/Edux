@@ -1,50 +1,28 @@
 import { Bell, MessageCircle, Users } from "lucide-react";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import { getUnReadNotifications } from "../../api/notificationAPI";
-import { useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
-import { useState } from "react";
-import { useAuth } from "../../Hooks/useAuth";
 
 export default function NotificationsMenu({
   notifications,
   setNotificationsData,
   onMarkAsRead,
 }) {
-  const [unread, setUnread] = useState(0);
-
-  const { user } = useAuth();
-  const fetchNotifications = async () => {
-    try {
-      const res = await getUnReadNotifications(user._id);
-      setNotificationsData(res);
-      setUnread(res.length);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    setUnread(notifications.filter((n) => !n.isRead).length);
-  }, [notifications]);
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative">
           <Bell />
-          {unread > 0 && (
+          {unreadCount > 0 && (
             <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center">
-              {unread}
+              {unreadCount}
             </Badge>
           )}
         </Button>

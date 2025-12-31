@@ -5,6 +5,7 @@ const User = require("./models/User.model");
 const RoomMember = require("./models/room_member.model");
 const RoomMessage = require("./models/room_message.model");
 const RoomModel = require("./models/room_member.model");
+const ResourceRequest = require("./models/resource_request.model");
 
 const EVENTS = Object.freeze({
   PRESENCE_SNAPSHOT: "presence:snapshot",
@@ -20,6 +21,8 @@ const EVENTS = Object.freeze({
   ROOM_SEND: "room:send",
   ROOM_RECEIVE: "room:receive",
   ROOM_NOTIFICATION: "room:notification",
+
+  REQUEST_NOTIFICATION: "request:notification",
 });
 
 const USER_ROOM = (userId) => `user:${userId}`;
@@ -273,6 +276,78 @@ module.exports = function (io) {
         }
       } catch (e) {
         console.error("ROOM_NOTIFICATION error:", e);
+      }
+    });
+    socket.on("request:create", async ({ requestId }) => {
+      console.log("request:create", requestId);
+      if (!requestId) return;
+
+      try {
+        const request = await ResourceRequest.findById(requestId).populate(
+          "resource owner requestor"
+        );
+        if (!request) return;
+
+        // Notify owner
+        const notification = await Notification.create({
+          type: "request",
+          user: request.owner._id,
+          sender: request.requestor._id,
+          resource: request.resource._id,
+          message: `${request.requestor.name} requested access to ${request.resource.title}`,
+          isRead: false,
+        });
+
+        await User.findByIdAndUpdate(request.owner._id, {
+          $addToSet: { notifications: notification._id },
+        });
+
+        const fullNotification = await notification.populate("sender resource");
+        console.log("fullNotification", fullNotification);
+        io.to(USER_ROOM(request.owner._id)).emit(EVENTS.REQUEST_NOTIFICATION, {
+          ...fullNotification.toObject(),
+          request: request,
+        });
+      } catch (err) {
+        console.error("request:create error:", err);
+      }
+    });
+
+    socket.on("request:update", async ({ requestId }) => {
+      console.log("request:update", requestId);
+      if (!requestId) return;
+
+      try {
+        const request = await ResourceRequest.findById(requestId).populate(
+          "resource owner requestor"
+        );
+        if (!request) return;
+
+        // Notify requester
+        const notification = await Notification.create({
+          type: "request",
+          user: request.requestor._id,
+          sender: request.owner._id,
+          resource: request.resource._id,
+          message: `Your request for ${request.resource.title} has been ${request.status}`,
+          isRead: false,
+        });
+
+        await User.findByIdAndUpdate(request.requestor._id, {
+          $addToSet: { notifications: notification._id },
+        });
+
+        const fullNotification = await notification.populate("sender resource");
+
+        io.to(USER_ROOM(request.requestor._id)).emit(
+          EVENTS.REQUEST_NOTIFICATION,
+          {
+            ...fullNotification.toObject(),
+            request: request,
+          }
+        );
+      } catch (err) {
+        console.error("request:update error:", err);
       }
     });
   });
