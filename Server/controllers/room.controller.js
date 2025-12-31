@@ -1,13 +1,37 @@
 const Room = require("../models/room.model");
 
+const RoomMember = require("../models/room_member.model");
+
 module.exports.findAllRooms = async (req, res) => {
   try {
-    const answer = await Room.find().populate("owner");
-    res.json(answer);
+    const userId = req.user?.id;
+
+    const rooms = await Room.find().populate("owner").lean();
+
+    if (!userId) {
+      return res.json(rooms.map(r => ({ ...r, isMember: false })));
+    }
+
+    const roomIds = rooms.map((r) => r._id);
+
+    const memberships = await RoomMember.find({
+      user: userId,
+      room: { $in: roomIds },
+    }).select("room").lean();
+
+    const memberSet = new Set(memberships.map((m) => String(m.room)));
+
+    const withFlags = rooms.map((r) => ({
+      ...r,
+      isMember: memberSet.has(String(r._id)),
+    }));
+
+    return res.json(withFlags);
   } catch (error) {
     return res.status(400).send({ error: error.message });
   }
 };
+
 
 module.exports.findRoom = async (req, res) => {
   try {
