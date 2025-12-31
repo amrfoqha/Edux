@@ -29,4 +29,3 @@ server/   → Backend (Node.js, Express)
 ```bash
 cd server
 npm install
-npm run dev
