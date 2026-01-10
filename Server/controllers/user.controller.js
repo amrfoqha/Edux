@@ -121,3 +121,24 @@ module.exports.getUserResourcesPage = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+module.exports.updateUserDownloads = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        $inc: { downloads: 1 },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
+};

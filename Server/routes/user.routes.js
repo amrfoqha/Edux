@@ -13,5 +13,6 @@ router.get("/:id", UserController.findUser);
 router.post("/", UserController.createUser);
 router.patch("/:id", UserController.updateUser);
 router.delete("/:id", UserController.deleteUser);
+router.patch("/downloads/:id", UserController.updateUserDownloads);
 
 module.exports = router;

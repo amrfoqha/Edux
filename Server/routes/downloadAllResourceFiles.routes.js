@@ -5,6 +5,6 @@ const {
 } = require("../controllers/downloadAllResourceFiles.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 
-router.get("/download-all/:id", downloadAllResourceFiles);
+router.get("/:id", downloadAllResourceFiles);
 
 module.exports = router;

@@ -125,3 +125,23 @@ module.exports.updateResourceAverageRating = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+module.exports.updateResourceDownloads = async (req, res) => {
+  // increate the current downloads by 1
+  try {
+    const resp = await Resource.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { downloads: 1 } },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).populate("uploader");
+    res.json(resp);
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json(error.errors);
+    }
+    return res.status(500).json({ message: "Server error" });
+  }
+};

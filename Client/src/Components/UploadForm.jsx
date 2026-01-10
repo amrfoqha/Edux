@@ -20,7 +20,7 @@ export const UploadForm = ({ refresh, setRefresh }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setRefresh(flag);
+    setRefresh(!flag);
     const fetchData = async () => {
       try {
         const res = await getUserResourcesPage(user._id, currentPage, limit);
@@ -32,7 +32,7 @@ export const UploadForm = ({ refresh, setRefresh }) => {
       }
     };
     fetchData();
-  }, [flag, currentPage]);
+  }, [flag, currentPage, open]);
 
   const FormOpen = () => {
     setOpen(!open);

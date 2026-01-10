@@ -46,8 +46,6 @@ const BrowesResourcePage = () => {
       setAllResources(resources.data);
       setTotalItems(resources.totalItems);
       setTotalPages(resources.totalPages);
-      console.log(resources);
-      console.log(totalItems, totalPages);
     } catch (error) {
       console.log(error);
     }
@@ -67,7 +65,8 @@ const BrowesResourcePage = () => {
           <div>
             <h1 className="text-4xl font-bold">Browse Resources</h1>
             <p className="text-muted-foreground text-lg">
-              Explore <span className="text-primary font-semibold">0</span>{" "}
+              Explore{" "}
+              <span className="text-primary font-semibold">{totalItems}</span>{" "}
               resources shared by students worldwide
             </p>
           </div>

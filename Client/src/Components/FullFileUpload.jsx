@@ -34,7 +34,6 @@ export default function FullFileUpload({
     const selectedFiles = e.target.files;
     if (!selectedFiles) return;
     const newFiles = Array.from(selectedFiles);
-    console.log(newFiles);
     setFile((prev) => [...prev, ...newFiles]);
     newFiles.forEach((file) => {
       if (file.type.startsWith("image/")) {
@@ -43,7 +42,6 @@ export default function FullFileUpload({
           setPreviews((prev) => ({ ...prev, [file.name]: reader.result }));
         };
         reader.readAsDataURL(file);
-        // setFile((prev) => [...prev, file]);
       }
     });
 
@@ -160,8 +158,6 @@ export default function FullFileUpload({
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto p-6 mt-10">
-      {/* Upload Buttons */}
-
       <div className="flex gap-4">
         <Button
           onClick={() => setUploadType("document")}
@@ -258,6 +254,7 @@ export default function FullFileUpload({
                 <FileText className="w-8 h-8 text-gray-500" />
               )}
               <span>{file.name}</span>
+              <span>{(file.size / 1024 / 1024).toFixed(2)} MB</span>
             </div>
             <Button variant="ghost" onClick={() => removeFile(file.name)}>
               <X />
@@ -266,7 +263,6 @@ export default function FullFileUpload({
         ))}
       </div>
 
-      {/* Suggested AI Tags */}
       {suggestedTags.length > 0 && (
         <div className="p-4 border rounded-lg flex flex-wrap gap-2">
           {suggestedTags.map((tag) => (
@@ -287,8 +283,6 @@ export default function FullFileUpload({
           ))}
         </div>
       )}
-
-      {/* Upload Button */}
 
       <div className=" flex-col gap-4 items-center">
         <div className="flex gap-4">

@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema(
     department: { type: String, required: [true, "Department is required"] },
     isOnline: { type: Boolean, default: false },
     resources: [{ type: mongoose.Schema.Types.ObjectId, ref: "Resource" }],
+    downloads: { type: Number, default: 0 },
   },
   {
     timestamps: true,

@@ -77,7 +77,8 @@ module.exports.getResourceStatus = async (req, res) => {
       .populate("resource")
       .populate("owner")
       .populate("requestor");
-    res.json(request);
+    if (!request) return null;
+    res.json(request.status);
   } catch (error) {
     return res.status(400).send({ error: error.message });
   }

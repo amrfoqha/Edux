@@ -100,7 +100,12 @@ const UserProfile = () => {
                   value={favorites?.length}
                   highlight
                 />
-                <StatCard label="Downloads" value="128" highlight />
+                <StatCard
+                  label="Downloads"
+                  value={user?.downloads || 0}
+                  highlight
+                />
+                {console.log(user)}
               </div>
             </div>
           </div>

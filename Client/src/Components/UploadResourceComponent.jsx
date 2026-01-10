@@ -174,7 +174,8 @@ const UploadResourceComponent = ({ setOpen, setFlag, flag }) => {
         privacy: "",
       });
       try {
-        await createResource(form);
+        const res = await createResource(form);
+        // setRefresh(!refresh);
         setOpen(false);
         navigate("/profile");
       } catch (error) {
