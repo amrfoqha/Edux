@@ -1,7 +1,7 @@
 # 🎓 Edux
 
 <img width="1920" height="2660" alt="screencapture-localhost-5173-2026-01-10-10_13_44" src="https://github.com/user-attachments/assets/6de73d84-d275-4dfa-9901-a2f4d3b632e1" />
-<img width="480" height="760" alt="screencapture-localhost-5173-login-2026-01-10-10_13_20" src="https://github.com/user-attachments/assets/d7ece27f-dc5f-4da6-b4e1-bc480ec01abb" />
+<img width="780" height="960" alt="screencapture-localhost-5173-login-2026-01-10-10_13_20" src="https://github.com/user-attachments/assets/d7ece27f-dc5f-4da6-b4e1-bc480ec01abb" />
 
 
 Edux is a university-focused web platform designed to help students share, request, and access academic resources in an organized and collaborative way.
