@@ -1,5 +1,9 @@
 # 🎓 Edux
 
+<img width="1920" height="2660" alt="screencapture-localhost-5173-2026-01-10-10_13_44" src="https://github.com/user-attachments/assets/6de73d84-d275-4dfa-9901-a2f4d3b632e1" />
+<img width="1920" height="983" alt="screencapture-localhost-5173-login-2026-01-10-10_13_20" src="https://github.com/user-attachments/assets/d7ece27f-dc5f-4da6-b4e1-bc480ec01abb" />
+
+
 Edux is a university-focused web platform designed to help students share, request, and access academic resources in an organized and collaborative way.
 
 The platform encourages peer-to-peer knowledge sharing while solving common problems such as expensive learning materials, scattered resources, and limited collaboration.
@@ -85,3 +89,22 @@ Main entities:
 ```bash
 git clone https://github.com/amrfoqha/Edux.git
 cd Edux
+
+Backend Setup
+cd server
+npm install
+npm run dev
+
+Frontend Setup
+cd client
+npm install
+npm run dev
+
+🌐 Environment Variables
+
+Create a .env file in the server directory:
+
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+
