@@ -9,8 +9,8 @@ export default function LoginPage() {
     const navigate = useNavigate();
     const { login } = useAuth();
 
-    const handleLogin = async (email, password) => {
-        const result = await login(email, password);
+    const handleLogin = async (form) => {
+        const result = await login(form.email, form.password);
 
         if (result.success) {
             navigate("/");

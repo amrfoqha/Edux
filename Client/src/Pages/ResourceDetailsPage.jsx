@@ -7,7 +7,7 @@ import {
 } from "../API/ResouceAPI";
 import Footer from "../Components/Footer";
 import { Button } from "../Components/ui/button";
-import { ArrowLeft, Download, Flag, Heart, Share2, Star } from "lucide-react";
+import { ArrowLeft, Download, ExternalLink,Flag, Heart, Share2, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "../components/ui/badge";
 import { Avatar, AvatarFallback } from "../components/ui/avatar";
@@ -72,6 +72,39 @@ const ResourceDetailsPage = () => {
       socket.off(EVENTS.REQUEST_NOTIFICATION, handleRequestNotification);
     };
   }, [id, user]);
+
+  const ACCESS_MODE_CONFIG = {
+    downloadable: {
+      label: "Download Resource",
+      icon: Download,
+      action: (resource) => downloadAll(resource._id, resource.title),
+      variant: "default",
+    },
+
+    external: {
+      label: "Open Resource",
+      icon: ExternalLink,
+      action: (resource) => window.open(resource.url, "_blank"),
+      variant: "outline",
+    },
+
+    generated: {
+      label: "Open Resource",
+      icon: ExternalLink,
+      action: (resource) => window.open(resource.url, "_blank"),
+      variant: "outline",
+    },
+
+    requestable: {
+      label: "Request Resource",
+      icon: Flag,
+      action: (resource) => {
+        console.log("Requesting resource:", resource._id);
+      },
+      variant: "secondary",
+    },
+  };
+
 
   const calculateRatingAvg = (reviews) => {
     const totalReviews = reviews.length;

@@ -10,7 +10,7 @@ import { joinRoom } from "@/API/RoomApi.jsx";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../Hooks/useAuth.jsx";
 
-export default function RoomCard({ room }) {
+export default function RoomCard({ room,onJoined }) {
   const {
     _id,
     name,
@@ -31,6 +31,7 @@ export default function RoomCard({ room }) {
     try {
       setJoining(true);
       const res = await joinRoom({ room: _id });
+      onJoined?.(_id);
       console.log(res);
     } catch (error) {
       console.error("Error joining room:", error);
@@ -118,12 +119,14 @@ export default function RoomCard({ room }) {
             </div>
           </div>
 
-          {user._id !== owner._id && (
+          {user._id !== owner._id && !room.isMember && (
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 className="w-full mt-4 shadow-lg"
-                onClick={handleJoin}
-                disabled={joining}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleJoin();
+                }}                disabled={joining}
               >
                 <MessageCircle className="h-4 w-4 mr-2" />
                 {joining ? "Joining..." : "Join Room"}
