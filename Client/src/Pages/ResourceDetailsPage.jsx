@@ -129,13 +129,20 @@ const ResourceDetailsPage = () => {
       const result = await addReview(reviewData);
       setReviews([...reviews, result]);
       calculateRatingDistribution(reviews);
-      await updateResourceAverageRating(id, avgRating);
+      setComment("");
+      setRating(0);
     } catch (error) {
       console.error("Error adding review:", error);
       throw error;
     }
   };
-
+  useEffect(() => {
+    if (!avgRating) return;
+    const updateAverageRating = async () => {
+      await updateResourceAverageRating(id, avgRating);
+    };
+    updateAverageRating();
+  }, [avgRating]);
   const RequestResource = async (resource, owner, requestor) => {
     try {
       await createRequestResource(resource, owner, requestor);
@@ -166,7 +173,7 @@ const ResourceDetailsPage = () => {
     const fetchResourceSatatus = async (id, user) => {
       try {
         const res = await getResourceStatus(id, user);
-        console.log(res);
+        if (!res) return;
         setRequestStatus(res);
       } catch (error) {
         console.error("Error get status:", error);
@@ -190,6 +197,7 @@ const ResourceDetailsPage = () => {
 
   useEffect(() => {
     const fetchFavorites = async () => {
+      if (!user) return;
       try {
         const favorites = await getAllFavoritesByUserId(user?._id);
         const isFavorite = favorites.some(
@@ -201,7 +209,7 @@ const ResourceDetailsPage = () => {
       }
     };
     fetchFavorites();
-  }, [user?._id]);
+  }, [user]);
 
   const addToFavorite = async (resourceId) => {
     if (isFavorite) {
@@ -231,7 +239,6 @@ const ResourceDetailsPage = () => {
     const fetchResource = async () => {
       try {
         const data = await getResource(id);
-        console.log(data);
         setResource(data);
       } catch (error) {
         console.error("Error fetching resource:", error);
@@ -239,6 +246,15 @@ const ResourceDetailsPage = () => {
     };
     fetchResource();
   }, [id]);
+
+  const handleDownloadAll = async (resourceId, userId) => {
+    try {
+      await downloadAll(resourceId, userId);
+      setResource({ ...resource, downloads: resource.downloads + 1 });
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   if (!resource) {
     return <p className="text-center mt-20">Loading...</p>;
@@ -271,7 +287,7 @@ const ResourceDetailsPage = () => {
           <p className="text-gray-500 mb-4">
             {resource.createdAt.toString().split("T")[0]}
           </p>
-          <div className="flex items-center gap-3 text-sm text-gray-600">
+          <div className="flex items-center gap-3 text-sm text-gray-600 transition-all ease-in-out duration-300 ">
             ⭐ {avgRating} ({reviews.length} reviews)
             <span>•</span>
             📥 {resource.downloads || 0} downloads
@@ -306,61 +322,49 @@ const ResourceDetailsPage = () => {
             </Avatar>
             <div>
               <p className="font-semibold text-lg">
-                Uploaded by {resource.uploader.name}
+                Uploaded by {resource.uploader?.name}
               </p>
               <p className="text-muted-foreground">Verified Contributor</p>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-4 pt-4">
-            <div className="flex flex-wrap gap-4">
-              {resource.privacy === "public" ||
-              user?._id === resource?.uploader?._id ||
-              requestStatus === "approved" ? (
-                  <Button
-                      size="lg"
-                      className="px-8 py-6 text-base"
-                      onClick={() => downloadAll(resource._id, resource.title)}
-                  >
-                    <Download className="h-5 w-5 mr-2" />
-                    Download Resource
-                  </Button>
-              ) : requestStatus === "pending" ? (
-                  <Button size="lg" className="px-8 py-6 text-base" disabled>
-                    <Download className="h-5 w-5 mr-2" />
-                    Pending ...
-                  </Button>
-              ) : (
-                  <Button
-                      size="lg"
-                      className="px-8 py-6 text-base"
-                      onClick={() => {
-                        if (!user) {
-                          navigate("/login");
-                          return;
-                        }
-                        RequestResource(
-                            resource._id,
-                            resource.uploader._id,
-                            user._id
-                        );
-                      }}
-                  >
-                    <Download className="h-5 w-5 mr-2" />
-                    Request Resource
-                  </Button>
-              )}
-            </div>
-
-            {/* 
-            <Link
-              to={`http://localhost:8000/api/resources/${resource._id}/download-all`}
-              target="_blank"
-              className="px-8 py-6 text-base"
-            >
-              <Download className="h-5 w-5 mr-2" />
-              Download Resource{" "}
-            </Link> */}
+            {resource.privacy === "public" ||
+            user?._id === resource?.uploader?._id ||
+            requestStatus === "approved" ? (
+              <Button
+                size="lg"
+                className="px-8 py-6 text-base"
+                onClick={() => handleDownloadAll(resource._id, user?._id)}
+              >
+                <Download className="h-5 w-5 mr-2" />
+                Download Resource
+              </Button>
+            ) : requestStatus === "pending" ? (
+              <Button size="lg" className="px-8 py-6 text-base" disabled>
+                <Download className="h-5 w-5 mr-2" />
+                Pending ...
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                className="px-8 py-6 text-base"
+                onClick={() => {
+                  if (!user) {
+                    navigate("/login");
+                    return;
+                  }
+                  RequestResource(
+                    resource._id,
+                    resource.uploader._id,
+                    user._id
+                  );
+                }}
+              >
+                <Download className="h-5 w-5 mr-2" />
+                Request Resource
+              </Button>
+            )}
 
             <Button
               size="lg"

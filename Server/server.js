@@ -17,6 +17,10 @@ require("./config/mongoose.config");
 const userRoutes = require("./routes/user.routes");
 
 app.use("/api/users", userRoutes);
+app.use(
+  "/api/download-resources",
+  require("./routes/downloadAllResourceFiles.routes")
+);
 app.use("/api/resources", require("./routes/resource.routes"));
 app.use("/api/rooms", require("./routes/room.routes"));
 app.use("/api/room-members", require("./routes/room_member.routes"));
@@ -28,7 +32,6 @@ app.use("/api/reviews", require("./routes/review.routes"));
 app.use("/api/resource-requests", require("./routes/resource_request.routes"));
 require("./routes/auth.routes")(app);
 app.use("/api/uploads", require("./routes/upload.routes"));
-app.use("/api/resources", require("./routes/downloadAllResourceFiles.routes"));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {

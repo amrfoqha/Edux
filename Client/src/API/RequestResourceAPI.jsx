@@ -19,8 +19,8 @@ export const getResourceStatus = async (resourceId, user) => {
     const res = await api.get(
       `/resource-requests/status/${resourceId}/${user}`
     );
-    console.log("status    " + res.data.status)
-    return res.data.status;
+    if (!res.data) return null;
+    return res.data;
   } catch (error) {
     console.error("Error in getting resource status :", error);
   }

@@ -81,9 +81,9 @@ export const getResourcesByPage = async (page, limit, params) => {
   }
 };
 
-export const downloadAll = async (resourceId, resourceTitle) => {
+export const downloadAll = async (resourceId, userId) => {
   try {
-    const res = await api.get(`/resources/download-all/${resourceId}`, {
+    const res = await api.get(`/download-resources/${resourceId}`, {
       responseType: "blob",
     });
 
@@ -91,13 +91,15 @@ export const downloadAll = async (resourceId, resourceTitle) => {
     const a = document.createElement("a");
 
     a.href = url;
-    a.download = `${resourceTitle || "resource"}.zip`;
+    a.download = `resource.zip`;
 
     document.body.appendChild(a);
     a.click();
 
     a.remove();
     window.URL.revokeObjectURL(url);
+    await updateResourceDownloads(resourceId);
+    await updateUserDownloads(userId);
   } catch (err) {
     console.error(err);
   }
@@ -123,4 +125,25 @@ export const getRelatedResource = async (id) => {
   } catch (error) {
     console.error("Error getting resource average rating:", error);
   }
-}
+};
+
+export const updateResourceDownloads = async (id) => {
+  try {
+    const response = await api.put(`/resources/${id}/downloads`);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating resource downloads:", error);
+    throw error;
+  }
+};
+
+export const updateUserDownloads = async (userId) => {
+  try {
+    const response = await api.patch(`/users/downloads/${userId}`);
+    console.log("updated");
+    return response.data;
+  } catch (error) {
+    console.error("Error updating user downloads:", error);
+    throw error;
+  }
+};

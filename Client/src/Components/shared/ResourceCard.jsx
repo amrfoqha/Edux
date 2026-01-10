@@ -104,14 +104,14 @@ export function ResourceCard({ resource, onClick, showDetails = true }) {
           <div className="flex items-center gap-1.5">
             <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
             <span className="font-semibold text-sm">
-              {Number(resource.average_rating).toFixed(1)}
+              {Number(resource.average_rating).toFixed(1) || 0}
             </span>
           </div>
 
           <div className="flex items-center gap-1.5 text-muted-foreground">
             <Download className="h-4 w-4" />
             <span className="text-sm font-medium">
-              {Number(resource.downloads).toLocaleString()}
+              {Number(resource.downloads) || 0}
             </span>
           </div>
         </CardFooter>

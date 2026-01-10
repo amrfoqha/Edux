@@ -34,7 +34,6 @@ export function Navbar({ currentPage, isLoggedIn }) {
     const fetchNotifications = async () => {
       try {
         const res = await getUnReadNotifications(user._id);
-        console.log(res);
         setNotifications(res);
       } catch (error) {
         console.log("Error fetching notifications:", error);

@@ -31,6 +31,7 @@ const resourceSchema = new mongoose.Schema(
       enum: ["public", "private"],
       default: "public",
     },
+    downloads: { type: Number, default: 0 },
   },
   {
     timestamps: true,
